@@ -64,7 +64,7 @@ public class StringHelper extends StringUtils {
         if (blurDisplayLength == null || blurDisplayLength <= 0)
             blurDisplayLength = length;
         if (start < 0 || length <= 0 || length >= str.length()
-                || blurDisplayLength >= str.length())
+                || blurDisplayLength >= str.length() || start + length > str.length())
             return str;
         String startStr = str.substring(0, start);
         String endStr = str.substring(start + length, str.length());
@@ -76,9 +76,16 @@ public class StringHelper extends StringUtils {
         System.out.println(s.replaceAll("(.{3})", "_"));
         String blurStr = StringHelper.blurStr(s, 7, 4, 4, null);
         System.out.println(blurStr);
+        blurStr = StringHelper.blurStr(s, 7, 10, 4, null);
+        System.out.println(blurStr);
         blurStr = StringHelper.blurStr(s, 0, 0, 3, null);
         System.out.println(blurStr);
         blurStr = StringHelper.blurStr(s, 0, 0, 0, null);
         System.out.println(blurStr);
+        String[] ss = new String[3];
+        ss[0] = "a";
+        ss[1] = "bb";
+        ss[2] = "cc";
+        System.out.println(StringHelper.join(ss, ","));
     }
 }
