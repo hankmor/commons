@@ -4,6 +4,9 @@ import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
+
 /**
  * 通用字符串处理工具类。
  * <p/>
@@ -71,21 +74,55 @@ public class StringHelper extends StringUtils {
         return startStr + repeat(blurKey, blurDisplayLength) + endStr;
     }
 
-    public static void main(String[] args) {
-        String s = "15100000000";
-        System.out.println(s.replaceAll("(.{3})", "_"));
-        String blurStr = StringHelper.blurStr(s, 7, 4, 4, null);
-        System.out.println(blurStr);
-        blurStr = StringHelper.blurStr(s, 7, 10, 4, null);
-        System.out.println(blurStr);
-        blurStr = StringHelper.blurStr(s, 0, 0, 3, null);
-        System.out.println(blurStr);
-        blurStr = StringHelper.blurStr(s, 0, 0, 0, null);
-        System.out.println(blurStr);
-        String[] ss = new String[3];
-        ss[0] = "a";
-        ss[1] = "bb";
-        ss[2] = "cc";
-        System.out.println(StringHelper.join(ss, ","));
+    /**
+     * string转换为unicode。
+     *
+     * @param string
+     * @return
+     */
+    public static String string2Unicode(String string) {
+        StringBuffer unicode = new StringBuffer();
+        for (int i = 0; i < string.length(); i++) {
+            // 取出每一个字符
+            char c = string.charAt(i);
+            // 转换为unicode
+            unicode.append("\\u" + Integer.toHexString(c));
+        }
+        return unicode.toString();
+    }
+
+    /**
+     * unicode 转字符串
+     */
+    public static String unicode2String(String unicode) {
+        StringBuffer string = new StringBuffer();
+        String[] hex = unicode.split("\\\\u");
+        for (int i = 1; i < hex.length; i++) {
+            // 转换出每一个代码点
+            int data = Integer.parseInt(hex[i], 16);
+            // 追加成string
+            string.append((char) data);
+        }
+        return string.toString();
+    }
+
+    public static void main(String[] args) throws UnsupportedEncodingException {
+//        String s = "15100000000";
+//        System.out.println(s.replaceAll("(.{3})", "_"));
+//        String blurStr = StringHelper.blurStr(s, 7, 4, 4, null);
+//        System.out.println(blurStr);
+//        blurStr = StringHelper.blurStr(s, 7, 10, 4, null);
+//        System.out.println(blurStr);
+//        blurStr = StringHelper.blurStr(s, 0, 0, 3, null);
+//        System.out.println(blurStr);
+//        blurStr = StringHelper.blurStr(s, 0, 0, 0, null);
+//        System.out.println(blurStr);
+//        String[] ss = new String[3];
+//        ss[0] = "a";
+//        ss[1] = "bb";
+//        ss[2] = "cc";
+//        System.out.println(StringHelper.join(ss, ","));
+        String s = "asdfgasdfasdffdas:ku::lu:";
+        System.out.println(StringHelper.string2Unicode(s));
     }
 }
