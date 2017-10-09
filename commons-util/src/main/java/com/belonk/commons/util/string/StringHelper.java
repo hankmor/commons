@@ -4,6 +4,8 @@ import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.UUID;
+
 /**
  * 通用字符串处理工具类。
  * <p/>
@@ -71,6 +73,19 @@ public class StringHelper extends StringUtils {
         return startStr + repeat(blurKey, blurDisplayLength) + endStr;
     }
 
+    /**
+     * 获取32为UUID字符串。
+     * <p>
+     * 该方法会去掉UUID中间所有的“-”。
+     *
+     * @param upper 是否返回大写，true - 大写，否则小写。
+     * @return 32为uuid
+     */
+    public static String uuid32(boolean upper) {
+        String uuid = UUID.randomUUID().toString().replaceAll("-", "");
+        return upper ? uuid.toUpperCase() : uuid;
+    }
+
     public static void main(String[] args) {
         String s = "15100000000";
         System.out.println(s.replaceAll("(.{3})", "_"));
@@ -87,5 +102,8 @@ public class StringHelper extends StringUtils {
         ss[1] = "bb";
         ss[2] = "cc";
         System.out.println(StringHelper.join(ss, ","));
+
+        System.out.println(StringHelper.uuid32(false));
+        System.out.println(StringHelper.uuid32(true));
     }
 }
