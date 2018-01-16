@@ -9,7 +9,9 @@ import java.nio.channels.FileChannel;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
- * 按行读取文本文件类。
+ * 按行读取文本文件工具类。
+ * <p>
+ * 按行读取大文本文件，
  * Created by sun on 2017/9/20.
  *
  * @author sunfuchang03@126.com
@@ -85,11 +87,12 @@ public class FileLineReader {
      * @param start     开始位置
      * @param sliceSize 读取长度
      * @return 处理末位置为一整行后，最终读取的长度
-     * @throws IOException
+     * @throws IOException IO异常
      */
     public long read(long start, long sliceSize) throws IOException {
-        if (sliceSize > fileLength)
+        if (sliceSize > fileLength) {
             sliceSize = fileLength;
+        }
         if (sliceSize < fileLength) {
             // 找到定位位置的换行，读取一行
             randomAccessFile.seek(sliceSize);
@@ -134,7 +137,7 @@ public class FileLineReader {
      * 读取整个文件。
      *
      * @return 读取文件长度
-     * @throws IOException
+     * @throws IOException IO异常
      */
     public long read() throws IOException {
         return read(0, fileLength);
@@ -161,8 +164,9 @@ public class FileLineReader {
 
         public Builder(String file, LineHandler handler) {
             this.file = new File(file);
-            if (!this.file.exists())
+            if (!this.file.exists()) {
                 throw new IllegalArgumentException("File can not be found.");
+            }
             this.handler = handler;
         }
 
@@ -173,8 +177,9 @@ public class FileLineReader {
          * @return 构建器
          */
         public FileLineReader.Builder charset(String charset) {
-            if (charset != null && !"".equals(charset))
+            if (charset != null && !"".equals(charset)) {
                 this.charset = charset;
+            }
             return this;
         }
 
@@ -185,8 +190,9 @@ public class FileLineReader {
          * @return 构建器
          */
         public FileLineReader.Builder bufferSize(int bufferSize) {
-            if (bufferSize > 0)
+            if (bufferSize > 0) {
                 this.bufferSize = bufferSize;
+            }
             return this;
         }
 

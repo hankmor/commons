@@ -11,13 +11,19 @@ import java.util.Set;
 import java.util.concurrent.CyclicBarrier;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.atomic.AtomicLong;
 
 /**
+ * 多线程按行文本文件读取器。
+ * <p>
+ * 将大文本文件分割为小块并交由单独的线程来读取。
+ * <p>
  * Created by sun on 2017/9/20.
  *
  * @author sunfuchang03@126.com
  * @version 1.0
+ * @see FileLineReader
+ * @see FileLineReader.Builder
+ * @see LineHandler
  * @since 1.0
  */
 public class MultiThreadFileLineReader extends FileLineReader {
@@ -51,13 +57,10 @@ public class MultiThreadFileLineReader extends FileLineReader {
 
         final long startTime = System.currentTimeMillis();
         // 所有线程都执行完后，选择一个线程来执行Ruunable的代码
-        cyclicBarrier = new CyclicBarrier(startEndPairs.size(), new Runnable() {
-            @Override
-            public void run() {
-                log.info("Use time : " + (System.currentTimeMillis() - startTime) + "ms.");
-                log.info("Read total lines : " + counter.get());
-                shutdown(); // 关闭资源
-            }
+        cyclicBarrier = new CyclicBarrier(startEndPairs.size(), () -> {
+            log.info("Use time : " + (System.currentTimeMillis() - startTime) + "ms.");
+            log.info("Read total lines : " + counter.get());
+            shutdown(); // 关闭资源
         });
         for (StartEndPair pair : startEndPairs) {
             log.debug("Slice size : " + pair);
@@ -112,6 +115,16 @@ public class MultiThreadFileLineReader extends FileLineReader {
         @Override
         public String toString() {
             return "star=" + start + ", end=" + end;
+        }
+
+        @Override
+        public int hashCode() {
+            return super.hashCode();
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            return obj instanceof StartEndPair && start == ((StartEndPair) obj).start && end == ((StartEndPair) obj).end;
         }
     }
 
@@ -177,8 +190,9 @@ public class MultiThreadFileLineReader extends FileLineReader {
          * @return 构建器
          */
         public Builder threadSize(int size) {
-            if (size > 0)
+            if (size > 0) {
                 this.threadSize = size;
+            }
             return this;
         }
 

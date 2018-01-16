@@ -1,6 +1,10 @@
 package com.belonk.io;
 
 /**
+ * 文件行处理器。
+ * <p>
+ * 读取文件后，由此类处理行逻辑，由具体调用者实现。
+ * <p>
  * Created by sun on 2017/9/20.
  *
  * @author sunfuchang03@126.com
