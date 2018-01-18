@@ -7,10 +7,6 @@ import java.util.Date;
 
 /**
  *
- * host  邮件服务地址 ，如：smtp.qq.com
- * port  邮件服务端口
- * userName 发送人的邮箱账号
- * password  发送人的邮箱密码
  * emailsubject  邮件主题
  * toUserName  接收方邮件账号
  * attachmentPath 附件地址
@@ -19,16 +15,16 @@ import java.util.Date;
  * Created by xiahuaze on 2018/1/18.
  */
 public class SendMail {
-    public void sendAttachmentMail(String host,int port,String userName,String password,String emailsubject,String toUserName,String attachmentPath,String attachmentPathName,String mailMSg) throws Exception {
+    public void sendAttachmentMail(String emailsubject,String toUserName,String attachmentPath,String attachmentPathName,String mailMSg) throws Exception {
         MultiPartEmail mail = new MultiPartEmail();
         // 设置邮箱服务器信息
-        mail.setSmtpPort(port);
-        mail.setHostName(host);
+        mail.setSmtpPort(465);
+        mail.setHostName("smtp.mxhichina.com");
         // 设置密码验证器
-        mail.setAuthentication(userName, password);
+        mail.setAuthentication("info@abcbooking.cn", "Airbc121212");
         mail.setSSLOnConnect(true);
         // 设置邮件发送者
-        mail.setFrom(userName);
+        mail.setFrom("info@abcbooking.cn");
         // 设置邮件接收者
         mail.addTo(toUserName);
         // 设置邮件编码
@@ -47,5 +43,13 @@ public class SendMail {
         mail.setSentDate(new Date());
         // 发送邮件
         mail.send();
+    }
+
+    public static void main(String[] args) {
+        try {
+            new SendMail().sendAttachmentMail("fdsafdsaf","397514930@qq.com","C:\\data\\app推广二维码.png","pp推广二维码.png","fdsafda");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }
