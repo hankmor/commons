@@ -15,7 +15,7 @@ import java.util.Date;
  * Created by xiahuaze on 2018/1/18.
  */
 public class SendMail {
-    public void sendAttachmentMail(String emailsubject,String toUserName,String attachmentPath,String attachmentPathName,String mailMSg) throws Exception {
+    public static void sendAttachmentMail(String emailsubject,String toUserName,String attachmentPath,String attachmentPathName,String mailMSg) throws Exception {
         MultiPartEmail mail = new MultiPartEmail();
         // 设置邮箱服务器信息
         mail.setSmtpPort(465);
