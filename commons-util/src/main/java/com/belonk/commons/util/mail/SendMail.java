@@ -3,7 +3,9 @@ package com.belonk.commons.util.mail;
 import org.apache.commons.mail.EmailAttachment;
 import org.apache.commons.mail.MultiPartEmail;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 /**
  *
@@ -15,7 +17,7 @@ import java.util.Date;
  * Created by xiahuaze on 2018/1/18.
  */
 public class SendMail {
-    public static void sendAttachmentMail(String emailsubject,String toUserName,String attachmentPath,String attachmentPathName,String mailMSg) throws Exception {
+    public static void sendAttachmentMail(String emailsubject,String toUserName,List attachmentPaths,String attachmentPathName,String mailMSg) throws Exception {
         MultiPartEmail mail = new MultiPartEmail();
         // 设置邮箱服务器信息
         mail.setSmtpPort(465);
@@ -34,10 +36,16 @@ public class SendMail {
         mail.setMsg(mailMSg);
         // 创建附件
         EmailAttachment attachment = new EmailAttachment();
-        attachment.setPath(attachmentPath);
+
+
         attachment.setDisposition(EmailAttachment.ATTACHMENT);
         attachment.setName(attachmentPathName);
-        mail.attach(attachment);
+        for (int i = 0; i < attachmentPaths.size(); i++) {
+            String attachmentPath = (String)attachmentPaths.get(i);
+            attachment.setPath(attachmentPath);
+            mail.attach(attachment);
+        }
+
 
         // 设置邮件发送时间
         mail.setSentDate(new Date());
@@ -46,8 +54,11 @@ public class SendMail {
     }
 
     public static void main(String[] args) {
+        List<String> paths = new ArrayList<>();
+        paths.add("C:\\data\\QQ截图20180123171318.png");
+        paths.add("C:\\data\\QQ截图20180123161502.png");
         try {
-            new SendMail().sendAttachmentMail("fdsafdsaf","397514930@qq.com","C:\\data\\app推广二维码.png","pp推广二维码.png","fdsafda");
+            new SendMail().sendAttachmentMail("fdsafdsaf","397514930@qq.com",paths,"推广二维码.png","fdsafda");
         } catch (Exception e) {
             e.printStackTrace();
         }
