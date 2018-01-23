@@ -8,7 +8,6 @@ import java.util.Date;
 import java.util.List;
 
 /**
- *
  * emailsubject  邮件主题
  * toUserName  接收方邮件账号
  * attachmentPath 附件地址
@@ -17,7 +16,7 @@ import java.util.List;
  * Created by xiahuaze on 2018/1/18.
  */
 public class SendMail {
-    public static void sendAttachmentMail(String emailsubject,String toUserName,List attachmentPaths,String attachmentPathName,String mailMSg) throws Exception {
+    public static void sendAttachmentMail(String emailsubject, String toUserName, List attachmentPaths, String mailMSg) throws Exception {
         MultiPartEmail mail = new MultiPartEmail();
         // 设置邮箱服务器信息
         mail.setSmtpPort(465);
@@ -37,20 +36,30 @@ public class SendMail {
         // 创建附件
         EmailAttachment attachment = new EmailAttachment();
 
-
         attachment.setDisposition(EmailAttachment.ATTACHMENT);
-        attachment.setName(attachmentPathName);
         for (int i = 0; i < attachmentPaths.size(); i++) {
-            String attachmentPath = (String)attachmentPaths.get(i);
+            String attachmentPath = (String) attachmentPaths.get(i);
             attachment.setPath(attachmentPath);
             mail.attach(attachment);
+            String fileNameWithSuffix = getFileNameWithSuffix("attachmentPath");
+            attachment.setName(fileNameWithSuffix);
         }
-
-
         // 设置邮件发送时间
         mail.setSentDate(new Date());
         // 发送邮件
         mail.send();
+    }
+
+    /**
+     * 保留文件名及后缀
+     */
+    public static String getFileNameWithSuffix(String pathandname) {
+        int start = pathandname.lastIndexOf("/");
+        if (start != -1) {
+            return pathandname.substring(start + 1);
+        } else {
+            return null;
+        }
     }
 
     public static void main(String[] args) {
@@ -58,7 +67,7 @@ public class SendMail {
         paths.add("C:\\data\\QQ截图20180123171318.png");
         paths.add("C:\\data\\QQ截图20180123161502.png");
         try {
-            new SendMail().sendAttachmentMail("fdsafdsaf","397514930@qq.com",paths,"推广二维码.png","fdsafda");
+            new SendMail().sendAttachmentMail("fdsafdsaf", "397514930@qq.com", paths, "fdsafda");
         } catch (Exception e) {
             e.printStackTrace();
         }
