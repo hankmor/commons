@@ -19,11 +19,11 @@ public class SendMail {
     public static void sendAttachmentMail(String emailsubject, String toUserName, List attachmentPaths, String mailMSg) throws Exception {
         MultiPartEmail mail = new MultiPartEmail();
         // 设置邮箱服务器信息
-        mail.setSmtpPort(465);
+        mail.setSmtpPort(25);
         mail.setHostName("smtp.mxhichina.com");
         // 设置密码验证器
         mail.setAuthentication("info@abcbooking.cn", "Airbc121212");
-        mail.setSSLOnConnect(true);
+        mail.setSSLOnConnect(false);
         // 设置邮件发送者
         mail.setFrom("info@abcbooking.cn");
         // 设置邮件接收者
