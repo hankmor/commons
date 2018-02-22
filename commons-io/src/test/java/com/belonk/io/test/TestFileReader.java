@@ -50,7 +50,6 @@ public class TestFileReader {
         builder.threadSize(10).charset("gbk").bufferSize(1024);
         MultiThreadFileLineReader fileLineReader = builder.build();
         fileLineReader.read();
-        long total = fileLineReader.getTotalCount();
         // fileLineReader.shutdown(); // 关闭流，这里线程执行，不能关闭，由线程执行
         // 2018-01-16 15:44:54.034 INFO  - [com.belonk.io.MultiThreadFileLineReader] Use time : 509ms.
         // 2018-01-16 15:44:54.034 INFO  - [com.belonk.io.MultiThreadFileLineReader] Read total lines : 337690

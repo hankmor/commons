@@ -67,7 +67,7 @@ public class SendMail {
         paths.add("C:\\data\\QQ截图20180123171318.png");
         paths.add("C:\\data\\QQ截图20180123161502.png");
         try {
-            new SendMail().sendAttachmentMail("fdsafdsaf", "397514930@qq.com", paths, "fdsafda");
+            SendMail.sendAttachmentMail("fdsafdsaf", "397514930@qq.com", paths, "fdsafda");
         } catch (Exception e) {
             e.printStackTrace();
         }
