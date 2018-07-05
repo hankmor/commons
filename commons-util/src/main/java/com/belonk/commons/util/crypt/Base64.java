@@ -1,8 +1,5 @@
 package com.belonk.commons.util.crypt;
 
-import sun.misc.BASE64Decoder;
-import sun.misc.BASE64Encoder;
-
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 
@@ -18,20 +15,30 @@ public class Base64 {
 
     //~ Instance fields ================================================================================================
 
-    private static BASE64Encoder base64Encoder = new BASE64Encoder();
-    private static BASE64Decoder base64Decoder = new BASE64Decoder();
 
     //~ Methods ========================================================================================================
 
     public static String encode(String encodeStr) throws UnsupportedEncodingException {
-        return base64Encoder.encode(encodeStr.getBytes("utf-8"));
+        return org.apache.commons.codec.binary.Base64.encodeBase64String(encodeStr.getBytes("utf-8"));
     }
 
     public static String encode(byte[] encodeBytes) {
-        return base64Encoder.encode(encodeBytes);
+        return org.apache.commons.codec.binary.Base64.encodeBase64String(encodeBytes);
     }
 
     public static byte[] decode(String decodeStr) throws IOException {
-        return base64Decoder.decodeBuffer(decodeStr);
+        return org.apache.commons.codec.binary.Base64.decodeBase64(decodeStr);
+    }
+
+    /**
+     * Decode a string, return a decoded string.
+     *
+     * @param decodeStr desc string
+     * @return decoded string
+     * @throws IOException
+     * @since 1.2
+     */
+    public static String decodeString(String decodeStr) throws IOException {
+        return new String(org.apache.commons.codec.binary.Base64.decodeBase64(decodeStr), "utf-8");
     }
 }

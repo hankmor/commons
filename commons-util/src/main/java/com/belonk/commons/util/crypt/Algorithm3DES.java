@@ -1,7 +1,7 @@
 package com.belonk.commons.util.crypt;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.crypto.Cipher;
 import javax.crypto.KeyGenerator;
@@ -10,7 +10,7 @@ import javax.crypto.spec.SecretKeySpec;
 
 public class Algorithm3DES {
 
-    private static final Log logger = LogFactory.getLog(Algorithm3DES.class);
+    private static final Logger logger = LoggerFactory.getLogger(Algorithm3DES.class);
 
     public static String ALGORITHM = "DESede";//采用3des算法
 

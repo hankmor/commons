@@ -168,6 +168,7 @@ public class IpHelper {
     }
 
     //~ Test Methods ===================================================================================================
+
     public static void main(String[] args) throws Exception {
 //        String mac = IpHelper.getMACAddress("10.6.12.95");
 //        System.out.println(mac);

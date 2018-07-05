@@ -4,16 +4,552 @@ import org.apache.commons.lang.StringUtils;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
+import java.time.*;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.TemporalAdjusters;
+import java.util.*;
 
 /**
- * 日期处理工具类。
+ * Created by sun on 2018/6/27.
  *
  * @author sunfuchang03@126.com
- * @since v2.0
+ * @version 1.0
+ * @since 1.0
  */
 public class DateUtils {
+    /*
+     * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+     *
+     * Static fields/constants/initializer
+     *
+     * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+     */
+
+    
+
+    /*
+     * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+     *
+     * Instance fields
+     *
+     * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+     */
+
+
+
+    /*
+     * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+     *
+     * Constructors
+     *
+     * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+     */
+
+
+
+    /*
+     * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+     *
+     * Public Methods
+     *
+     * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+     */
+
+    public static int weekOf(LocalDateTime localDateTime) {
+        DayOfWeek dayOfWeek = localDateTime.getDayOfWeek();
+        return dayOfWeek.getValue();
+    }
+
+    public static boolean isAfter(LocalDateTime srcDate, LocalDateTime destDate) {
+        return srcDate.isAfter(destDate);
+    }
+
+    public static LocalDateTime of(Date date) {
+        return LocalDateTime.ofInstant(date.toInstant(), ZoneId.systemDefault());
+    }
+
+    public static Date of(LocalDateTime localDateTime) {
+        return Date.from(localDateTime.toInstant(ZoneOffset.UTC));
+    }
+
+    public static Date of(LocalDate localDate) {
+        return of(localDate.atTime(LocalTime.now()));
+    }
+
+    public static Date of(LocalTime localTime) {
+        return of(localTime.atDate(LocalDate.now()));
+    }
+
+    /**
+     * 获取某一段日期的开始时间和结束时间。
+     *
+     * @param currentDay 日期字符串
+     * @param separator  日期字符串的分隔符
+     * @return 包含开始日期毫秒数和结束日期毫秒的map，开始key为<code>beg</code>，结束key<code>end</code>
+     * @throws Exception
+     */
+    public static final Map<String, Long> getCurrentDayBeginAndEnd(String currentDay, String separator) throws Exception {
+        Long beg = null;
+        Long end = null;
+        Map<String, Long> timeMap = new HashMap<>();
+        if (StringUtils.isNotBlank(currentDay) && StringUtils.isNotBlank(separator)) {
+            try {
+                String[] dates = currentDay.split(separator);
+                beg = parseToMills(dates[0] + " 00:00:00:000");
+                end = parseToMills(dates[1] + " 23:59:59:999");
+                timeMap.put("beg", beg);
+                timeMap.put("end", end);
+            } catch (Exception e) {
+                e.printStackTrace();
+                return null;
+            }
+            return timeMap;
+        }
+        return null;
+    }
+
+    /**
+     * 将字符串日期格式解析为日期毫秒数。
+     *
+     * @param formatDate 日期字符串
+     * @return 日期毫秒数
+     * @throws ParseException
+     */
+    public static final Long parseToMills(String formatDate) throws ParseException {
+        Date dt = parseToDate(formatDate);
+        return dt.getTime();
+    }
+
+    /**
+     * 计算开始日期和结束日期之间相差的小时数。
+     *
+     * @param begin 开始日期字符串
+     * @param end   结束日期字符串
+     * @return 小时数
+     * @throws ParseException
+     */
+    public static final long betweenHour(String begin, String end) throws ParseException {
+        long deltaMillis = parseToDateHour(end).getTime() - parseToDateHour(begin).getTime();
+        return Duration.ofMillis(deltaMillis).toHours();
+    }
+
+    /**
+     * 计算开始日期和结束日期之间相差的小时数。
+     *
+     * @param begin 开始日期毫秒数
+     * @param end   结束日期毫秒数
+     * @return 小时数
+     * @throws ParseException
+     */
+    public static final long betweenHour(long begin, long end) {
+        long deltaMillis = end - begin;
+        return Duration.ofMillis(deltaMillis).toHours();
+    }
+
+    /**
+     * 将完整日期解析为包含年月日时分的日期，不包括秒。
+     *
+     * @param formatDate 原始完整日期字符串
+     * @return 包含年月日时分的日期，秒为0
+     * @throws ParseException
+     */
+    public static final Date parseToDateHour(String formatDate) throws ParseException {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+        if (formatDate.contains("年") || formatDate.contains("月") || formatDate.contains("日")) {
+            sdf = new SimpleDateFormat("yyyy年MM月dd日 HH时mm分");
+            Date dt = sdf.parse(formatDate);
+            return dt;
+        }
+        if (formatDate.contains("/")) {
+            sdf = new SimpleDateFormat("yyyy/MM/dd HH/mm");
+            Date dt = sdf.parse(formatDate);
+            return dt;
+        }
+        Date dt = sdf.parse(formatDate);
+        return dt;
+    }
+
+    /**
+     * 将字符串日期格式化为日期对象。
+     *
+     * @param formatDate 字符串日期
+     * @return 日期对象
+     * @throws ParseException
+     */
+    public static final Date parseToDateMilis(String formatDate) throws ParseException {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        if (formatDate.contains("年") || formatDate.contains("月") || formatDate.contains("日")) {
+            sdf = new SimpleDateFormat("yyyy年MM月dd日 HH时mm分ss秒");
+            Date dt = sdf.parse(formatDate);
+            return dt;
+        }
+        if (formatDate.contains("/")) {
+            sdf = new SimpleDateFormat("yyyy/MM/dd HH/mm/ss");
+            Date dt = sdf.parse(formatDate);
+            return dt;
+        }
+        Date dt = sdf.parse(formatDate);
+        return dt;
+    }
+
+    /**
+     * 将字符串日期格式化为包含年月日的日期，时分秒为0.
+     *
+     * @param formatDate 字符串日期
+     * @return 日期对象
+     * @throws ParseException
+     */
+    public static final Date parseToDate(String formatDate) throws ParseException {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+        if (formatDate.contains("年") || formatDate.contains("月") || formatDate.contains("日")) {
+            sdf = new SimpleDateFormat("yyyy年MM月dd日");
+            Date dt = sdf.parse(formatDate);
+            return dt;
+        }
+        if (formatDate.contains("/")) {
+            sdf = new SimpleDateFormat("yyyy/MM/dd");
+            Date dt = sdf.parse(formatDate);
+            return dt;
+        }
+        Date dt = sdf.parse(formatDate);
+        return dt;
+    }
+
+    /**
+     * 获取某一日期是当月的第几天，从1开始。
+     *
+     * @param instant 日期毫秒数
+     * @return 当月第几天
+     */
+    public static final int getDayOfMonth(long instant) {
+        return Instant.ofEpochMilli(instant).atZone(ZoneId.systemDefault()).getDayOfMonth();
+    }
+
+    public static String getBeginOfCurrentMonth(long instant, SimpleDateFormat format) {
+        Calendar c = Calendar.getInstance();
+        c.add(Calendar.MONTH, 0);
+        c.set(Calendar.DAY_OF_MONTH, 1);//设置为1号,当前日期既为本月第一天
+        String first = format.format(c.getTime());
+        return first;
+    }
+
+    public static String getEndOfCurrentMonth(long instant, SimpleDateFormat format) {
+        Calendar ca = Calendar.getInstance();
+        ca.set(Calendar.DAY_OF_MONTH, ca.getActualMaximum(Calendar.DAY_OF_MONTH));
+        String last = format.format(ca.getTime());
+        return last;
+    }
+
+    public static final long betweenDays(String begin, String end) throws ParseException {
+        long beginTime = parseToMills(begin);
+        long endTime = parseToMills(end);
+        return countDays(endTime - beginTime);
+    }
+
+
+    public static final long countDays(long deltaMillis) {
+        return Duration.ofMillis(deltaMillis).toDays();
+    }
+
+    public static final long plusDays(long instant, long days) {
+        return Instant.ofEpochMilli(instant).atZone(ZoneId.systemDefault()).plusDays(days).toInstant().toEpochMilli();
+    }
+
+    public static final Long plusDays(String currentDay, long days) throws ParseException {
+        long current = parseToMills(currentDay);
+        return plusDays(current, days);
+    }
+
+    public static final Date plusYear(String currentDay, int year) throws ParseException {
+        return new Date(plusDays(currentDay, year * 365));
+    }
+
+    public static final String plusDaysToString(String currentDay, long day, String pattern) throws ParseException {
+        long millis = plusDays(currentDay, day);
+        return millisToDateTime(millis, pattern);
+    }
+
+    public static final Date plusDaysToDate(String currentDay, long days) throws ParseException {
+        long millis = plusDays(currentDay, days);
+        return new Date(millis);
+    }
+
+    /**
+     * 计算日期加上某天数后的日期。
+     *
+     * @param currentDay 原始日期
+     * @param days       天数
+     * @return 计算后的日期
+     * @throws ParseException
+     */
+    public static final Date plusDaysToDate(Date currentDay, long days) throws ParseException {
+        long millis = plusDays(currentDay.getTime(), days);
+        return new Date(millis);
+    }
+
+    /**
+     * 日期的毫秒数加上秒数，得到的日期毫秒。
+     *
+     * @param instant 日期的毫秒数
+     * @param seconds 描述
+     * @return 计算后的日期毫秒数
+     */
+    public static final long plusSeconds(long instant, long seconds) {
+        return Instant.ofEpochMilli(instant).atZone(ZoneId.systemDefault()).plusSeconds(seconds).toInstant().toEpochMilli();
+    }
+
+    /**
+     * 日期的毫秒数加上分钟数，得到的日期毫秒。
+     *
+     * @param instant 日期的毫秒数
+     * @param minutes 分钟数
+     * @return 计算后的日期毫秒数
+     */
+    public static final long plusMinutes(long instant, long minutes) {
+        return Instant.ofEpochMilli(instant).atZone(ZoneId.systemDefault()).plusMinutes(minutes).toInstant().toEpochMilli();
+    }
+
+    /**
+     * 计算日期加上某小时数后的日期。
+     *
+     * @param srcDate 原始日期
+     * @param hours   小时数
+     * @return 计算后日期
+     */
+    public static final Date plusHoursToDate(Date srcDate, int hours) {
+        long milli = Instant.ofEpochMilli(srcDate.getTime()).atZone(ZoneId.systemDefault()).plusHours(hours).toInstant().toEpochMilli();
+        return new Date(milli);
+    }
+
+    public static final String millisToDateTime(Long millis, String pattern) {
+        LocalDateTime time = Instant.ofEpochMilli(millis).atZone(ZoneId.systemDefault()).toLocalDateTime();
+        return time.format(DateTimeFormatter.ofPattern(pattern));
+    }
+
+    public static final String getBeginOfTheMouth(long instant) {
+        return Instant.ofEpochMilli(instant).atZone(ZoneId.systemDefault()).with(TemporalAdjusters.firstDayOfMonth()).toString();
+    }
+
+    public static final boolean isBeforeThanToday(Date day) throws ParseException {
+        long now = System.currentTimeMillis();
+        return day.getTime() < now;
+    }
+
+    /**
+     * 判断某一时间是否在一个区间内
+     *
+     * @param sourceTime 时间区间,半闭合,如[10:00-20:00)
+     * @param curTime    需要判断的时间 如10:00
+     * @return
+     * @throws IllegalArgumentException
+     */
+    public static boolean isInTime(String sourceTime, String curTime) {
+        if (sourceTime == null || !sourceTime.contains("-") || !sourceTime.contains(":")) {
+            throw new IllegalArgumentException("Illegal Argument arg:" + sourceTime);
+        }
+        if (curTime == null || !curTime.contains(":")) {
+            throw new IllegalArgumentException("Illegal Argument arg:" + curTime);
+        }
+        String[] args = sourceTime.split("-");
+        SimpleDateFormat sdf = new SimpleDateFormat("HH:mm");
+        try {
+            long now = sdf.parse(curTime).getTime();
+            long start = sdf.parse(args[0]).getTime();
+            long end = sdf.parse(args[1]).getTime();
+            if (args[1].equals("00:00")) {
+                args[1] = "24:00";
+            }
+            if (end < start) {
+                if (now >= end && now < start) {
+                    return false;
+                } else {
+                    return true;
+                }
+            } else {
+                if (now >= start && now < end) {
+                    return true;
+                } else {
+                    return false;
+                }
+            }
+        } catch (ParseException e) {
+            e.printStackTrace();
+            throw new IllegalArgumentException("Illegal Argument arg:" + sourceTime);
+        }
+
+    }
+
+    /**
+     * date2比date1多的天数
+     *
+     * @param date1
+     * @param date2
+     * @return
+     */
+    public static int differentDays(Date date1, Date date2) {
+        Calendar cal1 = Calendar.getInstance();
+        cal1.setTime(date1);
+
+        Calendar cal2 = Calendar.getInstance();
+        cal2.setTime(date2);
+        int day1 = cal1.get(Calendar.DAY_OF_YEAR);
+        int day2 = cal2.get(Calendar.DAY_OF_YEAR);
+
+        int year1 = cal1.get(Calendar.YEAR);
+        int year2 = cal2.get(Calendar.YEAR);
+        if (year1 != year2)   //同一年
+        {
+            int timeDistance = 0;
+            for (int i = year1; i < year2; i++) {
+                if (i % 4 == 0 && i % 100 != 0 || i % 400 == 0)    //闰年
+                {
+                    timeDistance += 366;
+                } else    //不是闰年
+                {
+                    timeDistance += 365;
+                }
+            }
+
+            return timeDistance + (day2 - day1);
+        } else    //不同年
+        {
+            System.out.println("判断day2 - day1 : " + (day2 - day1));
+            return day2 - day1;
+        }
+    }
+
+    /**
+     * 获取两个日期之间的所有日期（yyyy-MM-dd）
+     *
+     * @param begin
+     * @param end
+     * @return
+     * @Description
+     * @author XuJD
+     * @date 2017-4-1
+     */
+    public static List<Date> getBetweenDates(Date begin, Date end) {
+        List<Date> result = new ArrayList<Date>();
+        Calendar tempStart = Calendar.getInstance();
+        tempStart.setTime(begin);
+            /* Calendar tempEnd = Calendar.getInstance();
+            tempStart.add(Calendar.DAY_OF_YEAR, 1);
+            tempEnd.setTime(end);
+            while (tempStart.before(tempEnd)) {
+                result.add(tempStart.getTime());
+                tempStart.add(Calendar.DAY_OF_YEAR, 1);
+            }*/
+        while (begin.getTime() < end.getTime()) {
+            result.add(tempStart.getTime());
+            tempStart.add(Calendar.DAY_OF_YEAR, 1);
+            begin = tempStart.getTime();
+        }
+        return result;
+    }
+
+    /**
+     * 判断时间是否在时间段内
+     *
+     * @param nowTime
+     * @param beginTime
+     * @param endTime
+     * @return
+     */
+    public static boolean belongPeriod(Date nowTime, Date beginTime, Date endTime) {
+        Calendar date = Calendar.getInstance();
+        date.setTime(nowTime);
+
+        Calendar begin = Calendar.getInstance();
+        begin.setTime(beginTime);
+
+        Calendar end = Calendar.getInstance();
+        end.setTime(endTime);
+
+        if (date.compareTo(begin) == 0 || date.compareTo(end) == 0) {
+            return true;
+        }
+        if (date.after(begin) && date.before(end)) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    /**
+     * 根据传入时间获取传入时间的天的起点时间字符串（date为空时默认取当前系统时间）
+     *
+     * @param date
+     * @param format
+     * @return
+     */
+    public static final String getBeginOfDay(Date date, String format) {
+        Calendar calendar = Calendar.getInstance();
+        if (date != null) {
+            calendar.setTime(date);
+        }
+        calendar.setTime(new Date());
+        calendar.set(Calendar.HOUR_OF_DAY, 0);
+        calendar.set(Calendar.MINUTE, 0);
+        calendar.set(Calendar.SECOND, 0);
+        Date zero = calendar.getTime();
+        SimpleDateFormat simple = new SimpleDateFormat(format);
+        return simple.format(zero);
+    }
+
+
+    /**
+     * 由出生日期获得年龄
+     *
+     * @param birthDayStr
+     * @return
+     * @throws Exception
+     */
+    public static int getAge(String birthDayStr) throws Exception {
+        Date birthDay = parseToDate(birthDayStr);
+        Calendar cal = Calendar.getInstance();
+
+        if (cal.before(birthDay)) {
+            throw new IllegalArgumentException(
+                    "The birthDay is before Now.It's unbelievable!");
+        }
+        int yearNow = cal.get(Calendar.YEAR);
+        int monthNow = cal.get(Calendar.MONTH);
+        int dayOfMonthNow = cal.get(Calendar.DAY_OF_MONTH);
+        cal.setTime(birthDay);
+
+        int yearBirth = cal.get(Calendar.YEAR);
+        int monthBirth = cal.get(Calendar.MONTH);
+        int dayOfMonthBirth = cal.get(Calendar.DAY_OF_MONTH);
+
+        int age = yearNow - yearBirth;
+
+        if (monthNow <= monthBirth) {
+            if (monthNow == monthBirth) {
+                if (dayOfMonthNow < dayOfMonthBirth) {
+                    age--;
+                }
+            } else {
+                age--;
+            }
+        }
+        return age;
+    }
+
+    /**
+     * 年份减运算，计算少多少年之前的某一个日期。
+     *
+     * @param src  原日期
+     * @param year 多少年之前
+     * @return 最终日期
+     */
+    public static Date beforeYear(Date src, int year) {
+        if (src == null) return null;
+        if (year <= 0) return src;
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(src);
+        calendar.add(Calendar.YEAR, -year);
+        return calendar.getTime();
+    }
 
     /**
      * 将日期类型转换为指格式的字符串类型
@@ -260,36 +796,13 @@ public class DateUtils {
         return calendar.getTime();
     }
 
-    /**
-     * 年份减运算，计算少多少年之前的某一个日期。
+    /*
+     * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
      *
-     * @param src  原日期
-     * @param year 多少年之前
-     * @return 最终日期
+     * Private Methods
+     *
+     * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
      */
-    public static Date beforeYear(Date src, int year) {
-        if (src == null) return null;
-        if (year <= 0) return src;
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTime(src);
-        calendar.add(Calendar.YEAR, -year);
-        return calendar.getTime();
-    }
 
-    public static void main(String[] args) {
-        Date date = DateUtils.after(new Date(), 10);
-        System.out.println(date);
-        date = DateUtils.before(new Date(), 10);
-        System.out.println(date);
 
-        date = DateUtils.afterMonth(new Date(), 3);
-        System.out.println(date);
-        date = DateUtils.beforeMonth(new Date(), 3);
-        System.out.println(date);
-
-        date = DateUtils.afterYear(new Date(), 3);
-        System.out.println(date);
-        date = DateUtils.beforeYear(new Date(), 3);
-        System.out.println(date);
-    }
 }

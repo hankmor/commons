@@ -3,7 +3,9 @@ package com.belonk.io;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.*;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.IOException;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
 import java.util.HashSet;
@@ -28,15 +30,18 @@ import java.util.concurrent.Executors;
  */
 public class MultiThreadFileLineReader extends FileLineReader {
     //~ Static fields/initializers =====================================================================================
+
     private static Logger log = LoggerFactory.getLogger(MultiThreadFileLineReader.class);
 
     //~ Instance fields ================================================================================================
+
     private ExecutorService executorService;
     private Set<StartEndPair> startEndPairs;
     private CyclicBarrier cyclicBarrier;
     private int threadSize = 1;
 
     //~ Constructors ===================================================================================================
+
     private MultiThreadFileLineReader(File file, LineHandler handler, String charset, int bufferSize, int threadSize) {
         super(file, handler, charset, bufferSize);
         this.threadSize = threadSize;

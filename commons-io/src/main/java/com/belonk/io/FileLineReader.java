@@ -20,9 +20,11 @@ import java.util.concurrent.atomic.AtomicLong;
  */
 public class FileLineReader {
     //~ Static fields/initializers =====================================================================================
+
     private static Logger log = LoggerFactory.getLogger(FileLineReader.class);
 
     //~ Instance fields ================================================================================================
+
     protected String charset;
     protected int bufferSize = 1024;
     protected LineHandler handler;
@@ -32,6 +34,7 @@ public class FileLineReader {
     private byte[] readBuff;
 
     //~ Constructors ===================================================================================================
+
     protected FileLineReader(File file, LineHandler handler, String charset, int bufferSize) {
         this.fileLength = file.length();
         this.handler = handler;
