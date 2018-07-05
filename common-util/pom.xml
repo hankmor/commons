@@ -9,7 +9,7 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <version>1.2-SNAPSHOT</version>
-    <artifactId>commons-util</artifactId>
+    <artifactId>common-util</artifactId>
 
     <dependencies>
         <dependency>

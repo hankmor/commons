@@ -10,7 +10,7 @@
 
     <version>1.1-SNAPSHOT</version>
     <modelVersion>4.0.0</modelVersion>
-    <artifactId>commons-io</artifactId>
+    <artifactId>common-io</artifactId>
 
     <dependencies>
         <dependency>
