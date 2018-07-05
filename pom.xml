@@ -95,9 +95,9 @@
     </distributionManagement>
 
     <modules>
-        <module>commons-util</module>
-        <module>commons-msoffice</module>
-        <module>commons-io</module>
+        <module>common-util</module>
+        <module>common-msoffice</module>
+        <module>common-io</module>
         <module>common-mail</module>
         <module>common-lang</module>
         <module>common-json</module>
