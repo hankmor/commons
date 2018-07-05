@@ -9,6 +9,7 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
+    <version>1.0</version>
     <artifactId>commons-msoffice</artifactId>
     <properties>
         <poi.version>3.10-FINAL</poi.version>
