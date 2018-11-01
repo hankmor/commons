@@ -104,11 +104,14 @@ public class JacksonUtilTest {
     @Test
     public void testToJson3() {
         Map<String, Object> map = new HashMap<>();
-        map.put("abc", null);
-        map.put("aaa", 12);
+        map.put("e", null);
+        map.put("a", 12);
         Student student = new Student();
         student.setName("zhansan");
+        student.setClassName("class1");
+        student.setAge(100);
         map.put("student", student);
+        map.put("c", 12);
         System.out.println(JacksonUtil.toJson(map));
         System.out.println(JacksonUtil.toJsonWithNull(map));
     }

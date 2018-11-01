@@ -34,7 +34,7 @@ public class Student extends Person {
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
      */
 
-    @JsonIgnore
+    // @JsonIgnore
     private String className;
 
     /*
