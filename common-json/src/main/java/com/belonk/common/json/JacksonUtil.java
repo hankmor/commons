@@ -2,7 +2,9 @@ package com.belonk.common.json;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -58,6 +60,17 @@ public class JacksonUtil {
 
     public static <T> String toJson(T t) {
         try {
+            om.disable(SerializationFeature.WRITE_NULL_MAP_VALUES);
+            return om.writeValueAsString(t);
+        } catch (JsonProcessingException e) {
+            log.error("Convert object to json failed : ", e);
+        }
+        return null;
+    }
+
+    public static <T> String toJsonWithNull(T t) {
+        try {
+            om.enable(SerializationFeature.WRITE_NULL_MAP_VALUES);
             return om.writeValueAsString(t);
         } catch (JsonProcessingException e) {
             log.error("Convert object to json failed : ", e);
@@ -67,6 +80,17 @@ public class JacksonUtil {
 
     public static <T> T fromJson(String json, Class<T> clazz) {
         try {
+            om.enable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
+            return om.readValue(json, clazz);
+        } catch (IOException e) {
+            log.error("Convert json to object failed : ", e);
+        }
+        return null;
+    }
+
+    public static <T> T fromJsonIgnore(String json, Class<T> clazz) {
+        try {
+            om.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
             return om.readValue(json, clazz);
         } catch (IOException e) {
             log.error("Convert json to object failed : ", e);
@@ -76,6 +100,17 @@ public class JacksonUtil {
 
     public static <T> T fromJson(String json, TypeReference<T> typeReference) {
         try {
+            om.enable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
+            return om.readValue(json, typeReference);
+        } catch (IOException e) {
+            log.error("Convert json to object failed : ", e);
+        }
+        return null;
+    }
+
+    public static <T> T fromJsonIgnore(String json, TypeReference<T> typeReference) {
+        try {
+            om.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
             return om.readValue(json, typeReference);
         } catch (IOException e) {
             log.error("Convert json to object failed : ", e);
