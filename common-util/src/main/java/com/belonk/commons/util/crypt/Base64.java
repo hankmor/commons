@@ -26,6 +26,17 @@ public class Base64 {
         return org.apache.commons.codec.binary.Base64.encodeBase64String(encodeBytes);
     }
 
+    /**
+     * 加密后的字节
+     *
+     * @param encodeBytes 被加密字节
+     * @return byte[]
+     * @since 1.2
+     */
+    public static byte[] encodeBytes(byte[] encodeBytes) {
+        return org.apache.commons.codec.binary.Base64.encodeBase64(encodeBytes);
+    }
+
     public static byte[] decode(String decodeStr) throws IOException {
         return org.apache.commons.codec.binary.Base64.decodeBase64(decodeStr);
     }
