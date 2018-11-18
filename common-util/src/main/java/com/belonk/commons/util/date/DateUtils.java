@@ -69,7 +69,8 @@ public class DateUtils {
     }
 
     public static Date of(LocalDateTime localDateTime) {
-        return Date.from(localDateTime.toInstant(ZoneOffset.UTC));
+        OffsetDateTime odt = OffsetDateTime.now();
+        return Date.from(localDateTime.toInstant(odt.getOffset()));
     }
 
     public static Date of(LocalDate localDate) {
