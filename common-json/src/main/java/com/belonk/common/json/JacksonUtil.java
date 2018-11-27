@@ -110,7 +110,7 @@ public class JacksonUtil {
         return null;
     }
 
-    public static <T> T fromJsonIgnore(String json, TypeReference<T> typeReference) {
+    public static <T> T fromJsonIgnoreUnknown(String json, TypeReference<T> typeReference) {
         try {
             om.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
             return om.readValue(json, typeReference);

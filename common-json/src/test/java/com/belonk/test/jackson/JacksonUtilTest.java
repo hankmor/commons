@@ -123,7 +123,7 @@ public class JacksonUtilTest {
         Student student = JacksonUtil.fromJson(s, Student.class);
         Assert.assertNull(student);
         // 忽略不匹配的字段
-        student = JacksonUtil.fromJsonIgnore(s, Student.class);
+        student = JacksonUtil.fromJsonIgnoreUnknown(s, Student.class);
         Assert.assertNotNull(student);
         System.out.println(student.getClassName());
         System.out.println(student.getAge());
