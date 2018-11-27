@@ -1,5 +1,6 @@
 package com.belonk.common.json;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
@@ -61,6 +62,7 @@ public class JacksonUtil {
     public static <T> String toJson(T t) {
         try {
             om.disable(SerializationFeature.WRITE_NULL_MAP_VALUES);
+            om.setPropertyInclusion(JsonInclude.Value.construct(JsonInclude.Include.NON_EMPTY, JsonInclude.Include.NON_EMPTY));
             return om.writeValueAsString(t);
         } catch (JsonProcessingException e) {
             log.error("Convert object to json failed : ", e);
@@ -88,7 +90,7 @@ public class JacksonUtil {
         return null;
     }
 
-    public static <T> T fromJsonIgnore(String json, Class<T> clazz) {
+    public static <T> T fromJsonIgnoreUnknown(String json, Class<T> clazz) {
         try {
             om.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
             return om.readValue(json, clazz);
