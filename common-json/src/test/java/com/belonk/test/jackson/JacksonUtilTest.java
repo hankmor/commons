@@ -2,6 +2,8 @@ package com.belonk.test.jackson;
 
 import com.alibaba.fastjson.JSON;
 import com.belonk.common.json.JacksonUtil;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
 import org.junit.Assert;
 import org.junit.Test;
@@ -102,18 +104,30 @@ public class JacksonUtilTest {
     }
 
     @Test
-    public void testToJson3() {
+    public void testToJson3() throws JsonProcessingException {
         Map<String, Object> map = new HashMap<>();
         map.put("e", null);
+        map.put("B", "");
         map.put("a", 12);
         Student student = new Student();
         student.setName("zhansan");
-        student.setClassName("class1");
-        student.setAge(100);
+        // student.setClassName("class1");
+        student.setClassName("");
+        // student.setAge(100);
+        student.setAge(null);
         map.put("student", student);
         map.put("c", 12);
         System.out.println(JacksonUtil.toJson(map));
         System.out.println(JacksonUtil.toJsonWithNull(map));
+
+        System.out.println(JacksonUtil.toJson(student));
+        System.out.println(JacksonUtil.toJsonWithNull(student));
+
+        ObjectMapper om = new ObjectMapper();
+        String json = om.writeValueAsString(map);
+        System.out.println(json);
+        json = om.writeValueAsString(student);
+        System.out.println(json);
     }
 
     @Test

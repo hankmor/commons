@@ -62,7 +62,7 @@ public class JacksonUtil {
     public static <T> String toJson(T t) {
         try {
             om.disable(SerializationFeature.WRITE_NULL_MAP_VALUES);
-            om.setPropertyInclusion(JsonInclude.Value.construct(JsonInclude.Include.NON_EMPTY, JsonInclude.Include.NON_EMPTY));
+            om.setPropertyInclusion(JsonInclude.Value.construct(JsonInclude.Include.NON_NULL, JsonInclude.Include.NON_NULL));
             return om.writeValueAsString(t);
         } catch (JsonProcessingException e) {
             log.error("Convert object to json failed : ", e);
@@ -73,6 +73,7 @@ public class JacksonUtil {
     public static <T> String toJsonWithNull(T t) {
         try {
             om.enable(SerializationFeature.WRITE_NULL_MAP_VALUES);
+            om.setPropertyInclusion(JsonInclude.Value.construct(JsonInclude.Include.USE_DEFAULTS, JsonInclude.Include.USE_DEFAULTS));
             return om.writeValueAsString(t);
         } catch (JsonProcessingException e) {
             log.error("Convert object to json failed : ", e);
