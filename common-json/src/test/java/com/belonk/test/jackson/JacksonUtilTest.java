@@ -27,7 +27,7 @@ public class JacksonUtilTest {
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
      */
 
-    
+
 
     /*
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -81,22 +81,25 @@ public class JacksonUtilTest {
     public void testToJson1() {
         MyPager myPager = new MyPager();
         myPager.setSEcho(2);
-        // 字段命名不规范，jackson生成的有问题
+        myPager.setITotalRecords(10L);
+        myPager.setITotalDisplayRecords(100L);
+        // 字段命名不规范，jackson生成的有问题，需要使用@JsonProperty注解来指定名称
         System.out.println(JacksonUtil.toJson(myPager));
-        // {"aaData":[],"name":null,"status":null,"subjectId":null,"secho":2,"itotalRecords":0,"itotalDisplayRecords":0}
         System.out.println(JacksonUtil.toJsonWithNull(myPager));
-        // {"aaData":[],"iTotalDisplayRecords":0,"iTotalRecords":0,"sEcho":2}
         System.out.println(JSON.toJSONString(myPager));
         Gson gson = new Gson();
-        // {"iTotalRecords":0,"iTotalDisplayRecords":0,"sEcho":2,"aaData":[]}
         System.out.println(gson.toJson(myPager));
     }
 
     @Test
     public void testFromJson1() {
+        // TODO 多态反序列化
         String json = "{\"iDisplayStart\":0,\"iDisplayLength\":10,\"sEcho\":1,\"iColumns\":7,\"sColumns\":\"\",\"iSortingCols\":0,\"iSortCol_0\":null,\"sSortDir_0\":null,\"orderCol\":null,\"name\":\"\",\"status\":null,\"subjectId\":\"11227\"}";
-        MyPager myPager = JacksonUtil.fromJson(json, MyPager.class);
+        MyPager myPager = JacksonUtil.fromJsonIgnoreUnknown(json, MyPager.class);
         Assert.assertNotNull(myPager);
+        System.out.println(myPager.getITotalRecords());
+        System.out.println(myPager.getITotalDisplayRecords());
+        System.out.println(myPager.getSEcho());
         System.out.println(myPager.getStatus());
         System.out.println(myPager.getSubjectId());
         System.out.println(myPager.getName());
@@ -132,7 +135,7 @@ public class JacksonUtilTest {
 
     @Test
     public void testFromJson3() {
-        String s = "{\"className\":\"classs1\", \"name1\":\"zhangsan\"}";
+        String s = "{\"className\":\"classs1\", \"name\":\"zhangsan\", \"unknown\": \"unknownValue\"}";
         // 有没有匹配的属性，转换出来的对象为null
         Student student = JacksonUtil.fromJson(s, Student.class);
         Assert.assertNull(student);
@@ -144,6 +147,84 @@ public class JacksonUtilTest {
         System.out.println(student.getName());
     }
 
+    @Test
+    public void testConvert() {
+        String s = "{\"className\":\"classs1\", \"name\":\"zhangsan\", \"unknown\": \"unknownValue\"}";
+        Student student = JacksonUtil.fromJsonIgnoreUnknown(s, Student.class);
+        System.out.println(student);
+        Map map = JacksonUtil.convert(student, Map.class);
+        System.out.println(map);
+
+        student = JacksonUtil.convert(map, Student.class);
+        System.out.println(student);
+    }
+
+    public static void main(String[] args) {
+        JacksonUtilTest jacksonUtilTest = new JacksonUtilTest();
+        jacksonUtilTest.testToJsonWithThreads();
+        jacksonUtilTest.testFromJsonWithThreads();
+    }
+
+    public void testToJsonWithThreads() {
+        Map<String, Object> map = new HashMap<>();
+        map.put("e", null);
+        map.put("B", "");
+        map.put("a", 12);
+        Student student = new Student();
+        student.setName("zhansan");
+        // student.setClassName("class1");
+        student.setClassName("");
+        // student.setAge(100);
+        student.setAge(null);
+        map.put("student", student);
+        map.put("c", 12);
+        for (int i = 0; i < 10; i++) {
+            int finalI = i;
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    for (int j = 0; j < 10000; j++) {
+                        String json = JacksonUtil.toJson(map);
+                        Assert.assertTrue(json != null && !"".equalsIgnoreCase(json));
+                        Assert.assertTrue(!json.contains("\"e\":null"));
+                        json = JacksonUtil.toJsonWithNull(map);
+                        Assert.assertTrue(json != null && !"".equalsIgnoreCase(json));
+                        Assert.assertTrue(json.contains("\"e\":null"));
+
+                        json = JacksonUtil.toJson(student);
+                        Assert.assertTrue(json != null && !"".equalsIgnoreCase(json));
+                        Assert.assertTrue(!json.contains("\"age\":null"));
+                        json = JacksonUtil.toJsonWithNull(student);
+                        Assert.assertTrue(json != null && !"".equalsIgnoreCase(json));
+                        Assert.assertTrue(json.contains("\"age\":null"));
+                    }
+                }
+            }).start();
+        }
+    }
+
+    public void testFromJsonWithThreads() {
+        String s = "{\"className\":\"classs1\", \"name1\":\"zhangsan\"}";
+        for (int i = 0; i < 10; i++) {
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    for (int j = 0; j < 10000; j++) {
+                        // 有没有匹配的属性，转换出来的对象为null
+                        Student student = JacksonUtil.fromJson(s, Student.class);
+                        Assert.assertNull(student);
+                        // 忽略不匹配的字段
+                        student = JacksonUtil.fromJsonIgnoreUnknown(s, Student.class);
+                        Assert.assertNotNull(student);
+                        Assert.assertNotNull(student.getClassName());
+                        Assert.assertNull(student.getAge());
+                        Assert.assertNull(student.getName());
+                    }
+                }
+            }).start();
+        }
+    }
+
     /*
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
      *
@@ -151,9 +232,9 @@ public class JacksonUtilTest {
      *
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
      */
-    
-    
-    
+
+
+
     /*
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
      *
@@ -161,9 +242,9 @@ public class JacksonUtilTest {
      *
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
      */
-     
-     
-     
+
+
+
     /*
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
      *

@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import org.slf4j.Logger;
@@ -28,7 +29,8 @@ public class JacksonUtil {
      */
 
     private static Logger log = LoggerFactory.getLogger(JacksonUtil.class);
-    private static ObjectMapper om = new ObjectMapper();
+    private static ObjectMapper defaultMapper = new ObjectMapper();
+    private static ObjectMapper customMapper = new ObjectMapper();
 
     /*
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -48,6 +50,14 @@ public class JacksonUtil {
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
      */
 
+    static {
+        defaultMapper.setSerializationInclusion(JsonInclude.Include.NON_EMPTY);
+        defaultMapper.disable(SerializationFeature.WRITE_NULL_MAP_VALUES);
+
+        customMapper.setSerializationInclusion(JsonInclude.Include.USE_DEFAULTS);
+        customMapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
+    }
+
     private JacksonUtil() {
     }
 
@@ -61,9 +71,10 @@ public class JacksonUtil {
 
     public static <T> String toJson(T t) {
         try {
-            om.disable(SerializationFeature.WRITE_NULL_MAP_VALUES);
-            om.setPropertyInclusion(JsonInclude.Value.construct(JsonInclude.Include.NON_NULL, JsonInclude.Include.NON_NULL));
-            return om.writeValueAsString(t);
+            return defaultMapper.writeValueAsString(t);
+            // return defaultMapper.writer()
+            //         .without(SerializationFeature.WRITE_NULL_MAP_VALUES)
+            //         .writeValueAsString(t);
         } catch (JsonProcessingException e) {
             log.error("Convert object to json failed : ", e);
         }
@@ -72,9 +83,9 @@ public class JacksonUtil {
 
     public static <T> String toJsonWithNull(T t) {
         try {
-            om.enable(SerializationFeature.WRITE_NULL_MAP_VALUES);
-            om.setPropertyInclusion(JsonInclude.Value.construct(JsonInclude.Include.USE_DEFAULTS, JsonInclude.Include.USE_DEFAULTS));
-            return om.writeValueAsString(t);
+            return customMapper.writeValueAsString(t);
+            // final ObjectWriter writer = includeNullMapper.writer();
+            // return writer.writeValueAsString(t);
         } catch (JsonProcessingException e) {
             log.error("Convert object to json failed : ", e);
         }
@@ -83,8 +94,8 @@ public class JacksonUtil {
 
     public static <T> T fromJson(String json, Class<T> clazz) {
         try {
-            om.enable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
-            return om.readValue(json, clazz);
+            return defaultMapper.readValue(json, clazz);
+            // return defaultMapper.readerFor(clazz).readValue(json);
         } catch (IOException e) {
             log.error("Convert json to object failed : ", e);
         }
@@ -93,8 +104,10 @@ public class JacksonUtil {
 
     public static <T> T fromJsonIgnoreUnknown(String json, Class<T> clazz) {
         try {
-            om.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
-            return om.readValue(json, clazz);
+            return customMapper.readValue(json, clazz);
+            // return defaultMapper.readerFor(clazz)
+            //         .without(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
+            //         .readValue(json);
         } catch (IOException e) {
             log.error("Convert json to object failed : ", e);
         }
@@ -103,8 +116,8 @@ public class JacksonUtil {
 
     public static <T> T fromJson(String json, TypeReference<T> typeReference) {
         try {
-            om.enable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
-            return om.readValue(json, typeReference);
+            return customMapper.readValue(json, typeReference);
+            // return defaultMapper.readerFor(typeReference).readValue(json);
         } catch (IOException e) {
             log.error("Convert json to object failed : ", e);
         }
@@ -113,12 +126,18 @@ public class JacksonUtil {
 
     public static <T> T fromJsonIgnoreUnknown(String json, TypeReference<T> typeReference) {
         try {
-            om.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
-            return om.readValue(json, typeReference);
+            return defaultMapper.readValue(json, typeReference);
+            // return defaultMapper.readerFor(typeReference)
+            //         .without(DeserializationFeature.FAIL_ON_IGNORED_PROPERTIES)
+            //         .readValue(json);
         } catch (IOException e) {
             log.error("Convert json to object failed : ", e);
         }
         return null;
+    }
+
+    public static <T> T convert(Object fromValue, Class<T> toValueType) {
+        return defaultMapper.convertValue(fromValue, toValueType);
     }
 
     /*
