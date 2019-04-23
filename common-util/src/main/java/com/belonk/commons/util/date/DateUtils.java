@@ -13,7 +13,7 @@ import java.util.*;
  * Created by sun on 2018/6/27.
  *
  * @author sunfuchang03@126.com
- * @version 1.0
+ * @version 1.2
  * @since 1.0
  */
 public class DateUtils {
@@ -25,7 +25,7 @@ public class DateUtils {
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
      */
 
-    
+
 
     /*
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -55,7 +55,7 @@ public class DateUtils {
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
      */
 
-    public static int weekOf(LocalDateTime localDateTime) {
+    public static int weekOfMonth(LocalDateTime localDateTime) {
         DayOfWeek dayOfWeek = localDateTime.getDayOfWeek();
         return dayOfWeek.getValue();
     }
@@ -87,9 +87,8 @@ public class DateUtils {
      * @param currentDay 日期字符串
      * @param separator  日期字符串的分隔符
      * @return 包含开始日期毫秒数和结束日期毫秒的map，开始key为<code>beg</code>，结束key<code>end</code>
-     * @throws Exception
      */
-    public static final Map<String, Long> getCurrentDayBeginAndEnd(String currentDay, String separator) throws Exception {
+    public static Map<String, Long> getCurrentDayBeginAndEnd(String currentDay, String separator) {
         Long beg = null;
         Long end = null;
         Map<String, Long> timeMap = new HashMap<>();
@@ -114,9 +113,9 @@ public class DateUtils {
      *
      * @param formatDate 日期字符串
      * @return 日期毫秒数
-     * @throws ParseException
+     * @throws ParseException throw <code>ParseException</code> when parse date failed
      */
-    public static final Long parseToMills(String formatDate) throws ParseException {
+    public static Long parseToMills(String formatDate) throws ParseException {
         Date dt = parseToDate(formatDate);
         return dt.getTime();
     }
@@ -127,9 +126,9 @@ public class DateUtils {
      * @param begin 开始日期字符串
      * @param end   结束日期字符串
      * @return 小时数
-     * @throws ParseException
+     * @throws ParseException hrow <code>ParseException</code> when parse date failed
      */
-    public static final long betweenHour(String begin, String end) throws ParseException {
+    public static long betweenHour(String begin, String end) throws ParseException {
         long deltaMillis = parseToDateHour(end).getTime() - parseToDateHour(begin).getTime();
         return Duration.ofMillis(deltaMillis).toHours();
     }
@@ -140,9 +139,8 @@ public class DateUtils {
      * @param begin 开始日期毫秒数
      * @param end   结束日期毫秒数
      * @return 小时数
-     * @throws ParseException
      */
-    public static final long betweenHour(long begin, long end) {
+    public static long betweenHour(long begin, long end) {
         long deltaMillis = end - begin;
         return Duration.ofMillis(deltaMillis).toHours();
     }
@@ -152,22 +150,19 @@ public class DateUtils {
      *
      * @param formatDate 原始完整日期字符串
      * @return 包含年月日时分的日期，秒为0
-     * @throws ParseException
+     * @throws ParseException hrow <code>ParseException</code> when parse date failed
      */
-    public static final Date parseToDateHour(String formatDate) throws ParseException {
+    public static Date parseToDateHour(String formatDate) throws ParseException {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm");
         if (formatDate.contains("年") || formatDate.contains("月") || formatDate.contains("日")) {
             sdf = new SimpleDateFormat("yyyy年MM月dd日 HH时mm分");
-            Date dt = sdf.parse(formatDate);
-            return dt;
+            return sdf.parse(formatDate);
         }
         if (formatDate.contains("/")) {
             sdf = new SimpleDateFormat("yyyy/MM/dd HH/mm");
-            Date dt = sdf.parse(formatDate);
-            return dt;
+            return sdf.parse(formatDate);
         }
-        Date dt = sdf.parse(formatDate);
-        return dt;
+        return sdf.parse(formatDate);
     }
 
     /**
@@ -175,22 +170,19 @@ public class DateUtils {
      *
      * @param formatDate 字符串日期
      * @return 日期对象
-     * @throws ParseException
+     * @throws ParseException throw <code>ParseException</code> when parse date failed
      */
-    public static final Date parseToDateMilis(String formatDate) throws ParseException {
+    public static Date parseToDateMilis(String formatDate) throws ParseException {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         if (formatDate.contains("年") || formatDate.contains("月") || formatDate.contains("日")) {
             sdf = new SimpleDateFormat("yyyy年MM月dd日 HH时mm分ss秒");
-            Date dt = sdf.parse(formatDate);
-            return dt;
+            return sdf.parse(formatDate);
         }
         if (formatDate.contains("/")) {
             sdf = new SimpleDateFormat("yyyy/MM/dd HH/mm/ss");
-            Date dt = sdf.parse(formatDate);
-            return dt;
+            return sdf.parse(formatDate);
         }
-        Date dt = sdf.parse(formatDate);
-        return dt;
+        return sdf.parse(formatDate);
     }
 
     /**
@@ -198,22 +190,19 @@ public class DateUtils {
      *
      * @param formatDate 字符串日期
      * @return 日期对象
-     * @throws ParseException
+     * @throws ParseException throw <code>ParseException</code> when parse date failed
      */
-    public static final Date parseToDate(String formatDate) throws ParseException {
+    public static Date parseToDate(String formatDate) throws ParseException {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
         if (formatDate.contains("年") || formatDate.contains("月") || formatDate.contains("日")) {
             sdf = new SimpleDateFormat("yyyy年MM月dd日");
-            Date dt = sdf.parse(formatDate);
-            return dt;
+            return sdf.parse(formatDate);
         }
         if (formatDate.contains("/")) {
             sdf = new SimpleDateFormat("yyyy/MM/dd");
-            Date dt = sdf.parse(formatDate);
-            return dt;
+            return sdf.parse(formatDate);
         }
-        Date dt = sdf.parse(formatDate);
-        return dt;
+        return sdf.parse(formatDate);
     }
 
     /**
@@ -222,55 +211,58 @@ public class DateUtils {
      * @param instant 日期毫秒数
      * @return 当月第几天
      */
-    public static final int getDayOfMonth(long instant) {
+    public static int getDayOfMonth(long instant) {
         return Instant.ofEpochMilli(instant).atZone(ZoneId.systemDefault()).getDayOfMonth();
     }
 
     public static String getBeginOfCurrentMonth(long instant, SimpleDateFormat format) {
         Calendar c = Calendar.getInstance();
         c.add(Calendar.MONTH, 0);
-        c.set(Calendar.DAY_OF_MONTH, 1);//设置为1号,当前日期既为本月第一天
-        String first = format.format(c.getTime());
-        return first;
+        // 设置为1号,当前日期既为本月第一天
+        c.set(Calendar.DAY_OF_MONTH, 1);
+        synchronized (DateUtils.class) {
+            return format.format(c.getTime());
+        }
     }
 
     public static String getEndOfCurrentMonth(long instant, SimpleDateFormat format) {
         Calendar ca = Calendar.getInstance();
         ca.set(Calendar.DAY_OF_MONTH, ca.getActualMaximum(Calendar.DAY_OF_MONTH));
-        String last = format.format(ca.getTime());
-        return last;
+        synchronized (DateUtils.class) {
+            return format.format(ca.getTime());
+        }
     }
 
-    public static final long betweenDays(String begin, String end) throws ParseException {
+    public static long betweenDays(String begin, String end) throws ParseException {
         long beginTime = parseToMills(begin);
         long endTime = parseToMills(end);
         return countDays(endTime - beginTime);
     }
 
 
-    public static final long countDays(long deltaMillis) {
+    public static long countDays(long deltaMillis) {
         return Duration.ofMillis(deltaMillis).toDays();
     }
 
-    public static final long plusDays(long instant, long days) {
+    public static long plusDays(long instant, long days) {
         return Instant.ofEpochMilli(instant).atZone(ZoneId.systemDefault()).plusDays(days).toInstant().toEpochMilli();
     }
 
-    public static final Long plusDays(String currentDay, long days) throws ParseException {
+    public static Long plusDays(String currentDay, long days) throws ParseException {
         long current = parseToMills(currentDay);
         return plusDays(current, days);
     }
 
-    public static final Date plusYear(String currentDay, int year) throws ParseException {
+    public static Date plusYear(String currentDay, int year) throws ParseException {
         return new Date(plusDays(currentDay, year * 365));
     }
 
-    public static final String plusDaysToString(String currentDay, long day, String pattern) throws ParseException {
+    public static String plusDaysToString(String currentDay, long day, String pattern) throws ParseException {
         long millis = plusDays(currentDay, day);
         return millisToDateTime(millis, pattern);
     }
 
-    public static final Date plusDaysToDate(String currentDay, long days) throws ParseException {
+    public static Date plusDaysToDate(String currentDay, long days) throws ParseException {
         long millis = plusDays(currentDay, days);
         return new Date(millis);
     }
@@ -281,9 +273,8 @@ public class DateUtils {
      * @param currentDay 原始日期
      * @param days       天数
      * @return 计算后的日期
-     * @throws ParseException
      */
-    public static final Date plusDaysToDate(Date currentDay, long days) throws ParseException {
+    public static Date plusDaysToDate(Date currentDay, long days) {
         long millis = plusDays(currentDay.getTime(), days);
         return new Date(millis);
     }
@@ -295,7 +286,7 @@ public class DateUtils {
      * @param seconds 描述
      * @return 计算后的日期毫秒数
      */
-    public static final long plusSeconds(long instant, long seconds) {
+    public static long plusSeconds(long instant, long seconds) {
         return Instant.ofEpochMilli(instant).atZone(ZoneId.systemDefault()).plusSeconds(seconds).toInstant().toEpochMilli();
     }
 
@@ -306,7 +297,7 @@ public class DateUtils {
      * @param minutes 分钟数
      * @return 计算后的日期毫秒数
      */
-    public static final long plusMinutes(long instant, long minutes) {
+    public static long plusMinutes(long instant, long minutes) {
         return Instant.ofEpochMilli(instant).atZone(ZoneId.systemDefault()).plusMinutes(minutes).toInstant().toEpochMilli();
     }
 
@@ -317,21 +308,21 @@ public class DateUtils {
      * @param hours   小时数
      * @return 计算后日期
      */
-    public static final Date plusHoursToDate(Date srcDate, int hours) {
+    public static Date plusHoursToDate(Date srcDate, int hours) {
         long milli = Instant.ofEpochMilli(srcDate.getTime()).atZone(ZoneId.systemDefault()).plusHours(hours).toInstant().toEpochMilli();
         return new Date(milli);
     }
 
-    public static final String millisToDateTime(Long millis, String pattern) {
+    public static String millisToDateTime(Long millis, String pattern) {
         LocalDateTime time = Instant.ofEpochMilli(millis).atZone(ZoneId.systemDefault()).toLocalDateTime();
         return time.format(DateTimeFormatter.ofPattern(pattern));
     }
 
-    public static final String getBeginOfTheMouth(long instant) {
+    public static String getBeginOfTheMouth(long instant) {
         return Instant.ofEpochMilli(instant).atZone(ZoneId.systemDefault()).with(TemporalAdjusters.firstDayOfMonth()).toString();
     }
 
-    public static final boolean isBeforeThanToday(Date day) throws ParseException {
+    public static boolean isBeforeThanToday(Date day) throws ParseException {
         long now = System.currentTimeMillis();
         return day.getTime() < now;
     }
@@ -341,8 +332,7 @@ public class DateUtils {
      *
      * @param sourceTime 时间区间,半闭合,如[10:00-20:00)
      * @param curTime    需要判断的时间 如10:00
-     * @return
-     * @throws IllegalArgumentException
+     * @return 如果在，返回{@code true}，否则返回{@code false}
      */
     public static boolean isInTime(String sourceTime, String curTime) {
         if (sourceTime == null || !sourceTime.contains("-") || !sourceTime.contains(":")) {
@@ -357,21 +347,13 @@ public class DateUtils {
             long now = sdf.parse(curTime).getTime();
             long start = sdf.parse(args[0]).getTime();
             long end = sdf.parse(args[1]).getTime();
-            if (args[1].equals("00:00")) {
+            if ("00:00".equals(args[1])) {
                 args[1] = "24:00";
             }
             if (end < start) {
-                if (now >= end && now < start) {
-                    return false;
-                } else {
-                    return true;
-                }
+                return now < end || now >= start;
             } else {
-                if (now >= start && now < end) {
-                    return true;
-                } else {
-                    return false;
-                }
+                return now >= start && now < end;
             }
         } catch (ParseException e) {
             e.printStackTrace();
@@ -381,11 +363,11 @@ public class DateUtils {
     }
 
     /**
-     * date2比date1多的天数
+     * 计算某一个日期{@code date2}比{@code date1}多的天数。
      *
-     * @param date1
-     * @param date2
-     * @return
+     * @param date1 被比较日期
+     * @param date2 基础日期
+     * @return 天数
      */
     public static int differentDays(Date date1, Date date2) {
         Calendar cal1 = Calendar.getInstance();
@@ -398,23 +380,21 @@ public class DateUtils {
 
         int year1 = cal1.get(Calendar.YEAR);
         int year2 = cal2.get(Calendar.YEAR);
-        if (year1 != year2)   //同一年
-        {
+        // 不同一年
+        if (year1 != year2) {
             int timeDistance = 0;
             for (int i = year1; i < year2; i++) {
-                if (i % 4 == 0 && i % 100 != 0 || i % 400 == 0)    //闰年
-                {
+                // 闰年
+                if (i % 4 == 0 && i % 100 != 0 || i % 400 == 0) {
                     timeDistance += 366;
-                } else    //不是闰年
-                {
+                    // 不是闰年
+                } else {
                     timeDistance += 365;
                 }
             }
-
             return timeDistance + (day2 - day1);
-        } else    //不同年
-        {
-            System.out.println("判断day2 - day1 : " + (day2 - day1));
+            // 同年
+        } else {
             return day2 - day1;
         }
     }
@@ -422,24 +402,14 @@ public class DateUtils {
     /**
      * 获取两个日期之间的所有日期（yyyy-MM-dd）
      *
-     * @param begin
-     * @param end
-     * @return
-     * @Description
-     * @author XuJD
-     * @date 2017-4-1
+     * @param begin 开始日期
+     * @param end   结束日期
+     * @return 所有日期列表
      */
     public static List<Date> getBetweenDates(Date begin, Date end) {
         List<Date> result = new ArrayList<Date>();
         Calendar tempStart = Calendar.getInstance();
         tempStart.setTime(begin);
-            /* Calendar tempEnd = Calendar.getInstance();
-            tempStart.add(Calendar.DAY_OF_YEAR, 1);
-            tempEnd.setTime(end);
-            while (tempStart.before(tempEnd)) {
-                result.add(tempStart.getTime());
-                tempStart.add(Calendar.DAY_OF_YEAR, 1);
-            }*/
         while (begin.getTime() < end.getTime()) {
             result.add(tempStart.getTime());
             tempStart.add(Calendar.DAY_OF_YEAR, 1);
@@ -449,12 +419,12 @@ public class DateUtils {
     }
 
     /**
-     * 判断时间是否在时间段内
+     * 判断某一日期是否在给定的时间段内
      *
-     * @param nowTime
-     * @param beginTime
-     * @param endTime
-     * @return
+     * @param nowTime   基础日期
+     * @param beginTime 开始日期
+     * @param endTime   结束日期
+     * @return 如果在返回{@code true}，否则返回{@code false}.
      */
     public static boolean belongPeriod(Date nowTime, Date beginTime, Date endTime) {
         Calendar date = Calendar.getInstance();
@@ -469,21 +439,17 @@ public class DateUtils {
         if (date.compareTo(begin) == 0 || date.compareTo(end) == 0) {
             return true;
         }
-        if (date.after(begin) && date.before(end)) {
-            return true;
-        } else {
-            return false;
-        }
+        return date.after(begin) && date.before(end);
     }
 
     /**
      * 根据传入时间获取传入时间的天的起点时间字符串（date为空时默认取当前系统时间）
      *
-     * @param date
-     * @param format
-     * @return
+     * @param date   日期
+     * @param format 格式
+     * @return 日期字符串
      */
-    public static final String getBeginOfDay(Date date, String format) {
+    public static String getBeginOfDay(Date date, String format) {
         Calendar calendar = Calendar.getInstance();
         if (date != null) {
             calendar.setTime(date);
@@ -501,11 +467,11 @@ public class DateUtils {
     /**
      * 由出生日期获得年龄
      *
-     * @param birthDayStr
-     * @return
-     * @throws Exception
+     * @param birthDayStr 出生日期字符串
+     * @return 年龄
+     * @throws ParseException 日期解析失败，则抛出异常
      */
-    public static int getAge(String birthDayStr) throws Exception {
+    public static int getAge(String birthDayStr) throws ParseException {
         Date birthDay = parseToDate(birthDayStr);
         Calendar cal = Calendar.getInstance();
 
@@ -544,8 +510,12 @@ public class DateUtils {
      * @return 最终日期
      */
     public static Date beforeYear(Date src, int year) {
-        if (src == null) return null;
-        if (year <= 0) return src;
+        if (src == null) {
+            return null;
+        }
+        if (year <= 0) {
+            return src;
+        }
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(src);
         calendar.add(Calendar.YEAR, -year);
@@ -642,9 +612,7 @@ public class DateUtils {
         Long smallMills = small.getTimeInMillis();
         Long bigMills = big.getTimeInMillis();
 
-        int days = (int) ((bigMills - smallMills) / 24 / 3600 / 1000);
-
-        return days;
+        return (int) ((bigMills - smallMills) / 24 / 3600 / 1000);
     }
 
     /**
@@ -660,7 +628,9 @@ public class DateUtils {
      * @return 转换后日期
      */
     public static Date transToTimePointOfDate(Date date, int hour, int minute, int second, int millisecond) {
-        if (date == null) return null;
+        if (date == null) {
+            return null;
+        }
         Calendar cal = Calendar.getInstance();
         cal.setTime(date);
         cal.set(Calendar.HOUR_OF_DAY, hour);
@@ -673,28 +643,14 @@ public class DateUtils {
     /**
      * 取给定日期的后一天。
      *
-     * @param date
-     * @return
+     * @param date 目标日期
+     * @return 后一天的日期
      */
     public static Date nextDate(Date date) {
         if (date == null) return null;
         Calendar cal = Calendar.getInstance();
         cal.setTime(date);
         cal.add(Calendar.DAY_OF_MONTH, 1);
-        return cal.getTime();
-    }
-
-    /**
-     * 取给定日期的前一天。
-     *
-     * @param date
-     * @return
-     */
-    public static Date prevDate(Date date) {
-        if (date == null) return null;
-        Calendar cal = Calendar.getInstance();
-        cal.setTime(date);
-        cal.add(Calendar.DAY_OF_MONTH, -1);
         return cal.getTime();
     }
 
@@ -707,14 +663,32 @@ public class DateUtils {
      * @return true - 在， false - 没在
      */
     public static boolean between(Date dest, Date start, Date end) {
-        if (dest == null || start == null || end == null)
+        if (dest == null || start == null || end == null) {
             return false;
+        }
         long destMilliseconds = dest.getTime();
         long startMilliseconds = start.getTime();
         long endMilliseconds = end.getTime();
-        if (endMilliseconds < startMilliseconds)
+        if (endMilliseconds < startMilliseconds) {
             return false;
+        }
         return startMilliseconds <= destMilliseconds && destMilliseconds <= endMilliseconds;
+    }
+
+    /**
+     * 取给定日期的前一天。
+     *
+     * @param date 目标日期
+     * @return 目标前一天
+     */
+    public static Date prevDate(Date date) {
+        if (date == null) {
+            return null;
+        }
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(date);
+        cal.add(Calendar.DAY_OF_MONTH, -1);
+        return cal.getTime();
     }
 
     /**
@@ -725,8 +699,12 @@ public class DateUtils {
      * @return 多少天后日期
      */
     public static Date after(Date src, int day) {
-        if (src == null) return null;
-        if (day <= 0) return src;
+        if (src == null) {
+            return null;
+        }
+        if (day <= 0) {
+            return src;
+        }
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(src);
         calendar.add(Calendar.DAY_OF_MONTH, day);
@@ -741,8 +719,12 @@ public class DateUtils {
      * @return 多少天前日期
      */
     public static Date before(Date src, int day) {
-        if (src == null) return null;
-        if (day <= 0) return src;
+        if (src == null) {
+            return null;
+        }
+        if (day <= 0) {
+            return src;
+        }
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(src);
         calendar.add(Calendar.DAY_OF_MONTH, -day);
@@ -757,8 +739,12 @@ public class DateUtils {
      * @return 最终日期
      */
     public static Date afterMonth(Date src, int month) {
-        if (src == null) return null;
-        if (month <= 0) return src;
+        if (src == null) {
+            return null;
+        }
+        if (month <= 0) {
+            return src;
+        }
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(src);
         calendar.add(Calendar.MONTH, month);
@@ -773,8 +759,12 @@ public class DateUtils {
      * @return 最终日期
      */
     public static Date beforeMonth(Date src, int month) {
-        if (src == null) return null;
-        if (month <= 0) return src;
+        if (src == null) {
+            return null;
+        }
+        if (month <= 0) {
+            return src;
+        }
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(src);
         calendar.add(Calendar.MONTH, -month);
@@ -789,8 +779,12 @@ public class DateUtils {
      * @return 最终日期
      */
     public static Date afterYear(Date src, int year) {
-        if (src == null) return null;
-        if (year <= 0) return src;
+        if (src == null) {
+            return null;
+        }
+        if (year <= 0) {
+            return src;
+        }
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(src);
         calendar.add(Calendar.YEAR, year);
