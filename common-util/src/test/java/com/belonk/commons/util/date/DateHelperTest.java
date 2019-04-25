@@ -58,7 +58,7 @@ public class DateHelperTest {
         LocalDate start = LocalDate.of(2019, 4, 1);
         LocalDate stop = LocalDate.of(2019, 4, 30);
         LocalDate.of(2019, 4, 30);
-        List<LocalDate> localDates = DateHelper.getEachDayDuring(start, stop);
+        List<LocalDate> localDates = DateHelper.splitEachDay(start, stop);
         Assert.assertEquals(localDates.size(), 30);
         Assert.assertEquals(localDates.get(0), start);
         Assert.assertEquals(localDates.get(localDates.size() - 1), stop);
@@ -116,6 +116,19 @@ public class DateHelperTest {
         dates = DateHelperTest.startAndStopDateOfWeek(date);
         Assert.assertEquals("2019-04-15 00:00:00", DateHelper.format(dates[0], "yyyy-MM-dd HH:mm:ss"));
         Assert.assertEquals("2019-04-21 23:59:59", DateHelper.format(dates[1], "yyyy-MM-dd HH:mm:ss"));
+
+        start = LocalDate.of(2018, 4, 1);
+        stop = LocalDate.of(2019, 4, 30);
+        List<String> months = DateHelper.splitEachMonth(start, stop);
+        Assert.assertEquals(13, months.size());
+        Assert.assertEquals("2018-04", months.get(0));
+        months = DateHelper.splitEachMonth(start, stop, "/");
+        Assert.assertEquals(13, months.size());
+        Assert.assertEquals("2018/04", months.get(0));
+
+        List<Integer> years = DateHelper.splitEachYear(start, stop);
+        Assert.assertEquals(2, years.size());
+        Assert.assertEquals(2018, (int) years.get(0));
     }
 
     public Date[] startAndStopOfRecentWeek(Date date, int week) {

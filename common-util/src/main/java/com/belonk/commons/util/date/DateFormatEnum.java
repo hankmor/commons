@@ -89,6 +89,14 @@ public enum DateFormatEnum {
 
     MM_DD_ZN("MM月dd日"),
 
+    YYYYMM("yyyyMM"),
+
+    YYYY_MM("yyyy-MM-dd"),
+
+    YYYY_MM_ZN("yyyy年MM月"),
+
+    YYYY_MM_SLASH("yyyy/MM"),
+
     ;
 
     public static final String DATE_TIME_SPLITTER = " ";

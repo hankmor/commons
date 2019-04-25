@@ -237,11 +237,49 @@ public final class DateHelper {
      * @param stop  结束日期
      * @return 所有日期列表
      */
-    public static List<LocalDate> getEachDayDuring(LocalDate start, LocalDate stop) {
+    public static List<LocalDate> splitEachDay(LocalDate start, LocalDate stop) {
         List<LocalDate> result = new ArrayList<>();
         while (start.compareTo(stop) <= 0) {
             result.add(start);
             start = start.plusDays(1);
+        }
+        return result;
+    }
+
+    public static List<String> splitEachMonth(LocalDate start, LocalDate stop) {
+        return splitEachMonth(start, stop, "-");
+    }
+
+    /**
+     * 获取两个日期之间的所有月份，使用{@link LocalDate}表示，格式为YYYY-MM。
+     *
+     * @param start    开始日期
+     * @param stop     结束日期
+     * @param splitter 年和月份间的间隔符
+     * @return 所有月份的字符串列表
+     */
+    public static List<String> splitEachMonth(LocalDate start, LocalDate stop, String splitter) {
+        List<String> result = new ArrayList<>();
+        while (start.compareTo(stop) <= 0) {
+            int month = start.getMonth().getValue();
+            result.add(start.getYear() + splitter + (month < 10 ? "0" + month : start.getMonth()));
+            start = start.plusMonths(1);
+        }
+        return result;
+    }
+
+    /**
+     * 获取两个日期之间的所有年份列表。
+     *
+     * @param start 开始日期
+     * @param stop  结束日期
+     * @return 所有年份列表
+     */
+    public static List<Integer> splitEachYear(LocalDate start, LocalDate stop) {
+        List<Integer> result = new ArrayList<>();
+        while (start.compareTo(stop) <= 0) {
+            result.add(start.getYear());
+            start = start.plusYears(1);
         }
         return result;
     }
