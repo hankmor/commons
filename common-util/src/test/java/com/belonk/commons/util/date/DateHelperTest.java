@@ -66,7 +66,9 @@ public class DateHelperTest {
         LocalDateTime localDateTime = LocalDateTime.of(2019, 4, 1, 15, 20, 20);
         LocalDate localDate = LocalDate.of(2019, 4, 1);
 
-        String str = DateHelper.format(localDate, DateFormatEnum.YYYY_MM_DD);
+        String str = DateHelper.format(localDate, DateFormatEnum.YYYY_MM);
+        Assert.assertEquals("2019-04", str);
+        str = DateHelper.format(localDate, DateFormatEnum.YYYY_MM_DD);
         Assert.assertEquals("2019-04-01", str);
         str = DateHelper.format(localDateTime, DateFormatEnum.YYYY_MM_DD_HH_MM_SS);
         Assert.assertEquals(localDateTime, DateHelper.fromDatetimeStr(str, DateFormatEnum.YYYY_MM_DD_HH_MM_SS));
@@ -120,6 +122,7 @@ public class DateHelperTest {
         start = LocalDate.of(2018, 4, 1);
         stop = LocalDate.of(2019, 4, 30);
         List<String> months = DateHelper.splitEachMonth(start, stop);
+        System.out.println(months);
         Assert.assertEquals(13, months.size());
         Assert.assertEquals("2018-04", months.get(0));
         months = DateHelper.splitEachMonth(start, stop, "/");

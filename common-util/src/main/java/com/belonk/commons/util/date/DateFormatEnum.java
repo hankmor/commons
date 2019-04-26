@@ -91,7 +91,7 @@ public enum DateFormatEnum {
 
     YYYYMM("yyyyMM"),
 
-    YYYY_MM("yyyy-MM-dd"),
+    YYYY_MM("yyyy-MM"),
 
     YYYY_MM_ZN("yyyy年MM月"),
 
@@ -103,7 +103,7 @@ public enum DateFormatEnum {
 
     private String value;
 
-    private DateFormatEnum(String value) {
+    DateFormatEnum(String value) {
         this.value = value;
     }
 

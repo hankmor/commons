@@ -262,7 +262,7 @@ public final class DateHelper {
         List<String> result = new ArrayList<>();
         while (start.compareTo(stop) <= 0) {
             int month = start.getMonth().getValue();
-            result.add(start.getYear() + splitter + (month < 10 ? "0" + month : start.getMonth()));
+            result.add(start.getYear() + splitter + (month < 10 ? "0" + month : start.getMonth().getValue()));
             start = start.plusMonths(1);
         }
         return result;
