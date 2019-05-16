@@ -132,6 +132,41 @@ public class DateHelperTest {
         List<Integer> years = DateHelper.splitEachYear(start, stop);
         Assert.assertEquals(2, years.size());
         Assert.assertEquals(2018, (int) years.get(0));
+
+        // interval test
+
+        Date start1 = DateHelper.from("2018-04-20 00:00:00", DateFormatEnum.YYYY_MM_DD_HH_MM_SS);
+        Date stop1 = DateHelper.from("2018-04-21 00:00:00", DateFormatEnum.YYYY_MM_DD_HH_MM_SS);
+        int years1 = DateHelper.yearIntervalInclude(start1, stop1);
+        Assert.assertEquals(1, years1);
+        int quarter1 = DateHelper.quarterIntervalInclude(start1, stop1);
+        Assert.assertEquals(1, quarter1);
+        int months1 = DateHelper.monthIntervalInclude(start1, stop1);
+        Assert.assertEquals(1, months1);
+        int days1 = DateHelper.dayIntervalInclude(start1, stop1);
+        Assert.assertEquals(2, days1);
+
+        start1 = DateHelper.from("2018-04-20 00:00:00", DateFormatEnum.YYYY_MM_DD_HH_MM_SS);
+        stop1 = DateHelper.from("2018-04-20 00:00:00", DateFormatEnum.YYYY_MM_DD_HH_MM_SS);
+        years1 = DateHelper.yearIntervalInclude(start1, stop1);
+        Assert.assertEquals(1, years1);
+        quarter1 = DateHelper.quarterIntervalInclude(start1, stop1);
+        Assert.assertEquals(1, quarter1);
+        months1 = DateHelper.monthIntervalInclude(start1, stop1);
+        Assert.assertEquals(1, months1);
+        days1 = DateHelper.dayIntervalInclude(start1, stop1);
+        Assert.assertEquals(1, days1);
+
+        start1 = DateHelper.from("2016-04-20 00:00:00", DateFormatEnum.YYYY_MM_DD_HH_MM_SS);
+        stop1 = DateHelper.from("2019-10-21 00:00:00", DateFormatEnum.YYYY_MM_DD_HH_MM_SS);
+        years1 = DateHelper.yearIntervalInclude(start1, stop1);
+        Assert.assertEquals(4, years1);
+        quarter1 = DateHelper.quarterIntervalInclude(start1, stop1);
+        Assert.assertEquals(3 + 2 * 4 + 4, quarter1);
+        months1 = DateHelper.monthIntervalInclude(start1, stop1);
+        Assert.assertEquals(3 * 12 + 6, months1);
+        days1 = DateHelper.dayIntervalInclude(start1, stop1);
+        Assert.assertEquals((stop1.getTime() - start1.getTime()) / 1000 / 60 / 60 / 24 + 1, days1);
     }
 
     public Date[] startAndStopOfRecentWeek(Date date, int week) {

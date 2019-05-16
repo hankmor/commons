@@ -400,6 +400,88 @@ public final class DateHelper {
         }
     }
 
+    public static int yearIntervalInclude(Date start, Date stop) {
+        return intervalInclude(start, stop, DateUnit.YEAR);
+    }
+
+    public static int monthIntervalInclude(Date start, Date stop) {
+        return intervalInclude(start, stop, DateUnit.MONTH);
+    }
+
+    public static int quarterIntervalInclude(Date start, Date stop) {
+        return intervalInclude(start, stop, DateUnit.QUARTER);
+    }
+
+    public static int dayIntervalInclude(Date start, Date stop) {
+        return intervalInclude(start, stop, DateUnit.DAY);
+    }
+
+    public static int intervalInclude(Date start, Date stop, DateUnit dateUnit) {
+        if (start == null || stop == null) {
+            throw new IllegalArgumentException("Start and stop date must not be null.");
+        }
+        if (dateUnit == null) {
+            throw new IllegalArgumentException("DateUnit must not be null.");
+        }
+        if (stop.compareTo(start) < 0) {
+            return 0;
+        }
+        if (stop.compareTo(start) == 0) {
+            return 1;
+        }
+        LocalDate startDate = of(start).toLocalDate();
+        LocalDate stopDate = of(stop).toLocalDate();
+        int stopYear = stopDate.getYear();
+        int startYear = startDate.getYear();
+        int startMonth = startDate.getMonth().getValue();
+        int stopMonth = stopDate.getMonth().getValue();
+
+        switch (dateUnit) {
+            case DAY:
+                return (int) (stopDate.toEpochDay() - startDate.toEpochDay() + 1);
+            case YEAR:
+                return stopYear - startYear + 1;
+            case MONTH:
+                if (stopYear == startYear) {
+                    return stopMonth - startMonth + 1;
+                } else {
+                    return (stopYear - startYear) * 12 + (stopMonth - startMonth);
+                }
+            case QUARTER:
+                int startQuarter = 0;
+                if (startMonth <= 3) {
+                    startQuarter = 1;
+                } else if (startMonth <= 6) {
+                    startQuarter = 2;
+                } else if (startMonth <= 9) {
+                    startQuarter = 3;
+                } else {
+                    startQuarter = 4;
+                }
+                int stopQuarter = 0;
+                if (stopMonth <= 3) {
+                    stopQuarter = 1;
+                } else if (stopMonth <= 6) {
+                    stopQuarter = 2;
+                } else if (stopMonth <= 9) {
+                    stopQuarter = 3;
+                } else {
+                    stopQuarter = 4;
+                }
+
+                int quarters = 0;
+                if (stopYear == startYear) {
+                    quarters = stopQuarter - startQuarter + 1;
+                } else {
+                    int yearTmp = stopDate.getYear() - startDate.getYear() - 1;
+                    quarters = yearTmp * 4 + (4 - startQuarter + 1) + stopQuarter;
+                }
+                return quarters;
+            default:
+        }
+        return 0;
+    }
+
     /*
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
      *
