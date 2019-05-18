@@ -161,8 +161,24 @@ public class JacksonUtilTest {
 
     public static void main(String[] args) {
         JacksonUtilTest jacksonUtilTest = new JacksonUtilTest();
-        jacksonUtilTest.testToJsonWithThreads();
-        jacksonUtilTest.testFromJsonWithThreads();
+        // jacksonUtilTest.testToJsonWithThreads();
+        // jacksonUtilTest.testFromJsonWithThreads();
+        Map<String, Object> map = new HashMap<>();
+        map.put("e", null);
+        map.put("B", "");
+        map.put("a", 12);
+        Student student = new Student();
+        student.setName("zhansan");
+        // student.setClassName("class1");
+        student.setClassName("");
+        // student.setAge(100);
+        student.setAge(null);
+        map.put("student", student);
+        map.put("c", 12);
+        System.out.println(JacksonUtil.toJson(map));
+        System.out.println(JacksonUtil.toJson(student));
+        System.out.println(JacksonUtil.toJsonWithNull(map));
+        System.out.println(JacksonUtil.toJsonWithNull(student));
     }
 
     public void testToJsonWithThreads() {

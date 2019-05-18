@@ -51,7 +51,9 @@ public class JacksonUtil {
      */
 
     static {
-        defaultMapper.setSerializationInclusion(JsonInclude.Include.NON_EMPTY);
+        // 属性值为null不序列化
+        defaultMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
+        // map值为null不序列化
         defaultMapper.disable(SerializationFeature.WRITE_NULL_MAP_VALUES);
 
         customMapper.setSerializationInclusion(JsonInclude.Include.USE_DEFAULTS);
