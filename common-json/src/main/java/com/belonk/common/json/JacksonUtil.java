@@ -118,7 +118,7 @@ public class JacksonUtil {
 
     public static <T> T fromJson(String json, TypeReference<T> typeReference) {
         try {
-            return customMapper.readValue(json, typeReference);
+            return defaultMapper.readValue(json, typeReference);
             // return defaultMapper.readerFor(typeReference).readValue(json);
         } catch (IOException e) {
             log.error("Convert json to object failed : ", e);
@@ -128,7 +128,7 @@ public class JacksonUtil {
 
     public static <T> T fromJsonIgnoreUnknown(String json, TypeReference<T> typeReference) {
         try {
-            return defaultMapper.readValue(json, typeReference);
+            return customMapper.readValue(json, typeReference);
             // return defaultMapper.readerFor(typeReference)
             //         .without(DeserializationFeature.FAIL_ON_IGNORED_PROPERTIES)
             //         .readValue(json);

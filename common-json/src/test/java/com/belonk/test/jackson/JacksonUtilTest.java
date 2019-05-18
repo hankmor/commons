@@ -3,13 +3,13 @@ package com.belonk.test.jackson;
 import com.alibaba.fastjson.JSON;
 import com.belonk.common.json.JacksonUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
 import org.junit.Assert;
 import org.junit.Test;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by sun on 2018/11/1.
@@ -145,6 +145,15 @@ public class JacksonUtilTest {
         System.out.println(student.getClassName());
         System.out.println(student.getAge());
         System.out.println(student.getName());
+
+        System.out.println("==============");
+
+        student = JacksonUtil.fromJsonIgnoreUnknown(s, new TypeReference<Student>() {
+        });
+        Assert.assertNotNull(student);
+        System.out.println(student.getClassName());
+        System.out.println(student.getAge());
+        System.out.println(student.getName());
     }
 
     @Test
@@ -163,22 +172,7 @@ public class JacksonUtilTest {
         JacksonUtilTest jacksonUtilTest = new JacksonUtilTest();
         // jacksonUtilTest.testToJsonWithThreads();
         // jacksonUtilTest.testFromJsonWithThreads();
-        Map<String, Object> map = new HashMap<>();
-        map.put("e", null);
-        map.put("B", "");
-        map.put("a", 12);
-        Student student = new Student();
-        student.setName("zhansan");
-        // student.setClassName("class1");
-        student.setClassName("");
-        // student.setAge(100);
-        student.setAge(null);
-        map.put("student", student);
-        map.put("c", 12);
-        System.out.println(JacksonUtil.toJson(map));
-        System.out.println(JacksonUtil.toJson(student));
-        System.out.println(JacksonUtil.toJsonWithNull(map));
-        System.out.println(JacksonUtil.toJsonWithNull(student));
+        jacksonUtilTest.testFromJson3();
     }
 
     public void testToJsonWithThreads() {
