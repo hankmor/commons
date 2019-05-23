@@ -15,6 +15,16 @@ public enum DateFormatEnum {
     YYYY_MM_DD("yyyy-MM-dd"),
 
     /**
+     * 日期格式化为(年-月-日 时:分:秒):yyyy-MM-dd HH:mm:ss
+     */
+    YYYY_MM_DD_HH_MM_SS("yyyy-MM-dd HH:mm:ss"),
+
+    /**
+     * 日期格式化为(年月日时分秒):yyyyMMddHHmmss
+     */
+    YYYYMMDDHHMMSS("yyyyMMddHHmmss"),
+
+    /**
      * 日期格式化为(年月日):yyyyMMdd
      */
     YYYYMMDD("yyyyMMdd"),
@@ -28,16 +38,6 @@ public enum DateFormatEnum {
      * 日期格式化为(时分秒):HHmmss
      */
     HHMMSS("HHmmss"),
-
-    /**
-     * 日期格式化为(年-月-日 时:分:秒):yyyy-MM-dd HH:mm:ss
-     */
-    YYYY_MM_DD_HH_MM_SS("yyyy-MM-dd HH:mm:ss"),
-
-    /**
-     * 日期格式化为(年月日时分秒):yyyyMMddHHmmss
-     */
-    YYYYMMDDHHMMSS("yyyyMMddHHmmss"),
 
     /**
      * 日期格式化为（月-日）:MM-dd
@@ -71,6 +71,8 @@ public enum DateFormatEnum {
      */
     YYYY_MM_DD_HH_MM_SS_SLASH("yyyy/MM/dd HH:mm:ss"),
 
+    YYYY_MM_DD_HH_MM_SLASH("yyyy/MM/dd HH:mm"),
+
     YYYY_MM_DD_HH_MM_SS_S_SLASH("yyyy/MM/dd HH:mm:ss.S"),
 
     MM_DD_SLASH("MM/dd"),
@@ -85,6 +87,8 @@ public enum DateFormatEnum {
      */
     YYYY_MM_DD_HH_MM_SS_ZN("yyyy年MM月dd日 HH:mm:ss"),
 
+    YYYY_MM_DD_HH_MM_ZN("yyyy年MM月dd日 HH:mm"),
+
     YYYY_MM_DD_HH_MM_SS_S_ZN("yyyy年MM月dd日 HH:mm:ss.S"),
 
     MM_DD_ZN("MM月dd日"),
@@ -96,6 +100,13 @@ public enum DateFormatEnum {
     YYYY_MM_ZN("yyyy年MM月"),
 
     YYYY_MM_SLASH("yyyy/MM"),
+
+    /**
+     * 日期格式化为(年-月-日 时:分):yyyy-MM-dd HH:mm
+     */
+    YYYY_MM_DD_HH_MM("yyyy-MM-dd HH:mm"),
+
+    YYYYMMDDHHMM("yyyyMMddHHmm"),
 
     ;
 
