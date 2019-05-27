@@ -1,5 +1,6 @@
 package com.belonk.commons.util.string;
 
+import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,12 +13,13 @@ import java.util.UUID;
  * <p>Created by sun on 2016/5/30.
  *
  * @author sunfuchang03@126.com
- * @version 1.0
  * @since 1.1
  */
 public class StringHelper extends StringUtils {
     //~ Static fields/initializers =====================================================================================
+
     private static final Logger LOG = LoggerFactory.getLogger(StringHelper.class);
+
 
     //~ Instance fields ================================================================================================
 
@@ -118,6 +120,85 @@ public class StringHelper extends StringUtils {
         return string.toString();
     }
 
+    // ~ 1.2版本添加
+
+    /**
+     * 进行字符串格式化
+     *
+     * @param target 目标字符串
+     * @param params format 参数
+     * @return format 后的
+     */
+    public static String format(String target, Object... params) {
+        if (target.contains("%s") && ArrayUtils.isNotEmpty(params)) {
+            return String.format(target, params);
+        }
+        return target;
+    }
+
+    /**
+     * 判断字符串是不是驼峰命名
+     * <li> 包含 '_' 不算 </li>
+     * <li> 首字母大写的不算 </li>
+     *
+     * @param str 字符串
+     * @return 结果
+     */
+    public static boolean isCamel(String str) {
+        if (str.contains(StringPool.UNDERSCORE)) {
+            return false;
+        }
+        return Character.isLowerCase(str.charAt(0));
+    }
+
+    /**
+     * 字符串驼峰转下划线格式
+     *
+     * @param param 需要转换的字符串
+     * @return 转换后的字符串
+     */
+    public static String camelToUnderscore(String param) {
+        if (isEmpty(param)) {
+            return EMPTY;
+        }
+        int len = param.length();
+        StringBuilder sb = new StringBuilder(len);
+        for (int i = 0; i < len; i++) {
+            char c = param.charAt(i);
+            if (Character.isUpperCase(c) && i > 0) {
+                sb.append(StringPool.UNDERSCORE);
+            }
+            sb.append(Character.toLowerCase(c));
+        }
+        return sb.toString();
+    }
+
+    /**
+     * 字符串下划线转驼峰格式
+     *
+     * @param param 需要转换的字符串
+     * @return 转换好的字符串
+     */
+    public static String underscoreToCamel(String param) {
+        if (isEmpty(param)) {
+            return EMPTY;
+        }
+        String temp = param.toLowerCase();
+        int len = temp.length();
+        StringBuilder sb = new StringBuilder(len);
+        for (int i = 0; i < len; i++) {
+            char c = temp.charAt(i);
+            if (c == StringPool.UNDERSCORE.charAt(0)) {
+                if (++i < len) {
+                    sb.append(Character.toUpperCase(temp.charAt(i)));
+                }
+            } else {
+                sb.append(c);
+            }
+        }
+        return sb.toString();
+    }
+
     public static void main(String[] args) {
         String s = "15100000000";
         System.out.println(s.replaceAll("(.{3})", "_"));
@@ -137,5 +218,9 @@ public class StringHelper extends StringUtils {
 
         System.out.println(StringHelper.uuid32(false));
         System.out.println(StringHelper.uuid32(true));
+
+        String str = "this_is_underscore";
+        System.out.println(StringHelper.underscoreToCamel(str));
+        System.out.println(StringHelper.camelToUnderscore(StringHelper.underscoreToCamel(str)));
     }
 }
