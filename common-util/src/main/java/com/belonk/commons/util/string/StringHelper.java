@@ -199,6 +199,16 @@ public class StringHelper extends StringUtils {
         return sb.toString();
     }
 
+    /**
+     * 是否为CharSequence类型
+     *
+     * @param clazz class
+     * @return true 为是 CharSequence 类型
+     */
+    public static boolean isCharSequence(Class<?> clazz) {
+        return clazz != null && CharSequence.class.isAssignableFrom(clazz);
+    }
+
     public static void main(String[] args) {
         String s = "15100000000";
         System.out.println(s.replaceAll("(.{3})", "_"));
