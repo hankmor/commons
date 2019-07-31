@@ -4,13 +4,15 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.databind.type.CollectionType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.lang.reflect.Type;
+import java.util.List;
 
 /**
  * Created by sun on 2018/5/30.
@@ -110,6 +112,34 @@ public class JacksonUtil {
             // return defaultMapper.readerFor(clazz)
             //         .without(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
             //         .readValue(json);
+        } catch (IOException e) {
+            log.error("Convert json to object failed : ", e);
+        }
+        return null;
+    }
+
+    public static <T> List<T> parseArray(String json, Class<T> clazz) {
+        try {
+            TypeReference<T> tTypeReference = new TypeReference<T>() {
+                @Override
+                public Type getType() {
+                    return clazz;
+                }
+            };
+            // 构造一个符合类型
+            CollectionType collectionType = defaultMapper.getTypeFactory().constructCollectionType(List.class, clazz);
+            return defaultMapper.readValue(json, collectionType);
+        } catch (IOException e) {
+            log.error("Convert json to object failed : ", e);
+        }
+        return null;
+    }
+
+    public static <T> List<T> parseArrayIgnoreUnknown(String json, Class<T> clazz) {
+        try {
+            // 构造一个符合类型
+            CollectionType collectionType = customMapper.getTypeFactory().constructCollectionType(List.class, clazz);
+            return customMapper.readValue(json, collectionType);
         } catch (IOException e) {
             log.error("Convert json to object failed : ", e);
         }

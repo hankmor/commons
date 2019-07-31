@@ -235,6 +235,26 @@ public class JacksonUtilTest {
         }
     }
 
+    @Test
+    public void testWithDate() {
+        String json = "{\"name\": \"test\", \"date\": \"2019-07-31 00:00:00\", \"noFormatDate\":\"2019-07-31\"}";
+        WithDate withDate = JacksonUtil.fromJson(json, WithDate.class);
+        System.out.println(withDate);
+    }
+
+    @Test
+    public void testWithDateAsList() {
+        String json = "[{\"name\": \"test\", \"date\": \"2019-07-31 00:00:00\", \"noFormatDate\":\"2019-07-31\"},{\"name\": \"test1\", \"date\": \"2019-07-31 00:00:00\", \"noFormatDate\":\"2019-07-31\"}]";
+        List<WithDate> withDates = JacksonUtil.parseArray(json, WithDate.class);
+        Assert.assertTrue(withDates != null && withDates.size() == 2);
+        json = "[{\"name\": \"test\", \"date\": \"2019-07-31 00:00:00\", \"noFormatDate\":\"2019-07-31\"},{\"name\": \"test1\", \"date\": \"2019-07-31 00:00:00\", \"noFormatDate\":\"2019-07-31\", \"unknown\":\"21\"}]";
+        withDates = JacksonUtil.parseArray(json, WithDate.class);
+        Assert.assertNull(withDates);
+        json = "[{\"name\": \"test\", \"date\": \"2019-07-31 00:00:00\", \"noFormatDate\":\"2019-07-31\"},{\"name\": \"test1\", \"date\": \"2019-07-31 00:00:00\", \"noFormatDate\":\"2019-07-31\", \"unknown\":\"21\"}]";
+        withDates = JacksonUtil.parseArrayIgnoreUnknown(json, WithDate.class);
+        Assert.assertTrue(withDates != null && withDates.size() == 2);
+    }
+
     /*
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
      *
