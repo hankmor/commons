@@ -118,6 +118,13 @@ public class JacksonUtil {
         return null;
     }
 
+    /**
+     * @param json  json
+     * @param clazz 实际类型
+     * @param <T>   实际类型
+     * @return list
+     * @since 1.1
+     */
     public static <T> List<T> parseArray(String json, Class<T> clazz) {
         try {
             TypeReference<T> tTypeReference = new TypeReference<T>() {
@@ -135,6 +142,13 @@ public class JacksonUtil {
         return null;
     }
 
+    /**
+     * @param json  json
+     * @param clazz 实际类型
+     * @param <T>   实际类型
+     * @return list
+     * @since 1.1
+     */
     public static <T> List<T> parseArrayIgnoreUnknown(String json, Class<T> clazz) {
         try {
             // 构造一个符合类型
