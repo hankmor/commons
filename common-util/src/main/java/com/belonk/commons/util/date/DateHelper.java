@@ -143,6 +143,10 @@ public final class DateHelper {
         return of(localDate.atTime(LocalTime.now()));
     }
 
+    public static Date ofStartOfDay(LocalDate localDate) {
+        return of(localDate.atStartOfDay());
+    }
+
     /**
      * 将{@link LocalTime}转换为{@link Date}，日期使用当前日期。
      *
@@ -355,7 +359,7 @@ public final class DateHelper {
     public static Date from(String dateString, DateFormatEnum dateFormatEnum) {
         switch (dateFormatEnum.formatType()) {
             case DateFormatEnum.DateFormatType.DATE:
-                return of(fromDateStr(dateString, dateFormatEnum));
+                return ofStartOfDay(fromDateStr(dateString, dateFormatEnum));
             case DateFormatEnum.DateFormatType.DATE_TIME:
                 return of(fromDatetimeStr(dateString, dateFormatEnum));
             default:
@@ -367,7 +371,7 @@ public final class DateHelper {
         if (format.contains(DateFormatEnum.DATE_TIME_SPLITTER)) {
             return of((fromDatetimeStr(dateString, format)));
         } else {
-            return of((fromDateStr(dateString, format)));
+            return ofStartOfDay((fromDateStr(dateString, format)));
         }
     }
 

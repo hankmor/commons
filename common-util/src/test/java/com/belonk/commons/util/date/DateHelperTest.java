@@ -180,8 +180,8 @@ public class DateHelperTest {
 
     @Test
     public void testFromAndReturnDate() {
-        String s = "2019-09-05 10:10";
-        DateFormatEnum dateFormatEnum = DateFormatEnum.YYYY_MM_DD_HH_MM;
+        String s = "2019-09-05";
+        DateFormatEnum dateFormatEnum = DateFormatEnum.YYYY_MM_DD;
         Date date = DateHelper.from(s, dateFormatEnum);
         System.out.println(date);
     }
