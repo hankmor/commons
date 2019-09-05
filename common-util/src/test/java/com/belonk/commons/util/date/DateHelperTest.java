@@ -1,6 +1,7 @@
 package com.belonk.commons.util.date;
 
 import org.junit.Assert;
+import org.junit.Test;
 
 import java.text.ParseException;
 import java.time.LocalDate;
@@ -175,6 +176,14 @@ public class DateHelperTest {
 
     public Date[] startAndStopDateOfWeek(Date date) {
         return DateHelper.startAndStopDateOfWeek(date);
+    }
+
+    @Test
+    public void testFromAndReturnDate() {
+        String s = "2019-09-05 10:10";
+        DateFormatEnum dateFormatEnum = DateFormatEnum.YYYY_MM_DD_HH_MM;
+        Date date = DateHelper.from(s, dateFormatEnum);
+        System.out.println(date);
     }
 
     /*

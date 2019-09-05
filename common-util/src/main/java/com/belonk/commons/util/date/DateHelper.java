@@ -353,7 +353,14 @@ public final class DateHelper {
     }
 
     public static Date from(String dateString, DateFormatEnum dateFormatEnum) {
-        return of(fromDatetimeStr(dateString, dateFormatEnum));
+        switch (dateFormatEnum.formatType()) {
+            case DateFormatEnum.DateFormatType.DATE:
+                return of(fromDateStr(dateString, dateFormatEnum));
+            case DateFormatEnum.DateFormatType.DATE_TIME:
+                return of(fromDatetimeStr(dateString, dateFormatEnum));
+            default:
+                throw new UnsupportedOperationException(String.format("Date [%s] and format [%s] is not supported yet.", dateString, dateFormatEnum.getValue()));
+        }
     }
 
     public static Date from(String dateString, String format) {
