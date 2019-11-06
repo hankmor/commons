@@ -186,6 +186,13 @@ public class DateHelperTest {
         System.out.println(date);
     }
 
+    @Test
+    public void testSplitQuarter() {
+        LocalDate start = LocalDate.of(2017, 4, 1);
+        LocalDate stop = LocalDate.of(2019, 4, 30);
+        System.out.println(DateHelper.splitEachQuarterWithDate(start, stop, "-"));
+    }
+
     /*
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
      *

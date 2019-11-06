@@ -272,6 +272,27 @@ public final class DateHelper {
         return result;
     }
 
+    public static List<String> splitEachQuarter(LocalDate start, LocalDate stop, String splitter) {
+        List<String> result = new ArrayList<>();
+        while (start.compareTo(stop) <= 0) {
+            int month = start.getMonth().getValue();
+            result.add(start.getYear() + splitter + ((month + 2) / 3));
+            start = start.plusMonths(3);
+        }
+        return result;
+    }
+
+    public static Map<String, DateTuple> splitEachQuarterWithDate(LocalDate start, LocalDate stop, String splitter) {
+        Map<String, DateTuple> result = new HashMap<>();
+        while (start.compareTo(stop) <= 0) {
+            int month = start.getMonth().getValue();
+            String key = (start.getYear() + splitter + ((month + 2) / 3));
+            result.put(key, getDateTuple(start.getYear(), (month + 2) / 3));
+            start = start.plusMonths(3);
+        }
+        return result;
+    }
+
     /**
      * 获取两个日期之间的所有年份列表。
      *
@@ -501,7 +522,35 @@ public final class DateHelper {
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
      */
 
-
+    private static DateTuple getDateTuple(int year, int quarter) {
+        if (year <= 0 || (quarter > 4 || quarter <= 0)) {
+            throw new IllegalArgumentException("Illegal arguments : " + year + ", " + quarter);
+        }
+        switch (quarter) {
+            case 1:
+                return new DateTuple(
+                        LocalDateTime.of(year, 1, 1, 0, 0, 0),
+                        LocalDateTime.of(year, 3, 30, 23, 59, 59)
+                );
+            case 2:
+                return new DateTuple(
+                        LocalDateTime.of(year, 4, 1, 0, 0, 0),
+                        LocalDateTime.of(year, 6, 30, 23, 59, 59)
+                );
+            case 3:
+                return new DateTuple(
+                        LocalDateTime.of(year, 7, 1, 0, 0, 0),
+                        LocalDateTime.of(year, 9, 30, 23, 59, 59)
+                );
+            case 4:
+                return new DateTuple(
+                        LocalDateTime.of(year, 10, 1, 0, 0, 0),
+                        LocalDateTime.of(year, 12, 31, 23, 59, 59)
+                );
+            default:
+                throw new IllegalArgumentException("Illegal arguments : " + year + ", " + quarter);
+        }
+    }
 
     /*
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -520,6 +569,5 @@ public final class DateHelper {
      *
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
      */
-
 
 }
