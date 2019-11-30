@@ -3,6 +3,8 @@ package com.belonk.commons.util.asserts;
 import org.apache.commons.lang.StringUtils;
 
 import java.io.File;
+import java.util.Collection;
+import java.util.Map;
 
 /**
  * 参数检查、断言工具
@@ -229,5 +231,17 @@ public abstract class Assert {
     public static void exists(File file) {
         if (!file.exists())
             throw new RuntimeException("[Assertion failed] - this given file or directory is required; it must not be null and exist.");
+    }
+
+    public static void notEmpty(Collection collection) {
+        if (collection == null || collection.isEmpty()) {
+            throw new RuntimeException("[Assertion failed] - this given collection is required; it must not be null and empty.");
+        }
+    }
+
+    public static void notEmpty(Map map) {
+        if (map == null || map.isEmpty()) {
+            throw new RuntimeException("[Assertion failed] - this given map is required; it must not be null and empty.");
+        }
     }
 }
