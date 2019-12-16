@@ -22,6 +22,7 @@ import java.net.URL;
  */
 public class IpHelper {
     //~ Static fields/initializers =====================================================================================
+
     private static final Logger LOG = LoggerFactory.getLogger(IpHelper.class);
 
     /**
@@ -48,7 +49,7 @@ public class IpHelper {
         if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
             ip = request.getRemoteAddr();
         }
-        return ip;
+        return "0:0:0:0:0:0:0:1".equals(ip) ? "127.0.0.1" : ip;
     }
 
     /**
@@ -63,7 +64,7 @@ public class IpHelper {
     }
 
     /**
-     * 获取本机mac地址�?
+     * 获取本机mac地址
      *
      * @return mac地址
      * @throws Exception
@@ -151,7 +152,7 @@ public class IpHelper {
      * 判断ip地址是否真实有效
      *
      * @param ip ip地址
-     * @return true/false，有�?/无效�?
+     * @return true/false，有/无效
      */
     public static boolean isValidIpAddr(String ip) {
         if (ip == null || "".equals(ip))
@@ -164,6 +165,115 @@ public class IpHelper {
             return true;
         } else {
             return false;
+        }
+    }
+
+    public static boolean isInternalIp(String ip) {
+        byte[] addr = textToNumericFormatV4(ip);
+        return internalIp(addr) || "127.0.0.1".equals(ip);
+    }
+
+    /**
+     * 将IPv4地址转换成字节
+     *
+     * @param text IPv4地址
+     * @return byte 字节
+     */
+    private static byte[] textToNumericFormatV4(String text) {
+        if (text.length() == 0) {
+            return null;
+        }
+
+        byte[] bytes = new byte[4];
+        String[] elements = text.split("\\.", -1);
+        try {
+            long l;
+            int i;
+            switch (elements.length) {
+                case 1:
+                    l = Long.parseLong(elements[0]);
+                    if ((l < 0L) || (l > 4294967295L)) {
+                        return null;
+                    }
+                    bytes[0] = (byte) (int) (l >> 24 & 0xFF);
+                    bytes[1] = (byte) (int) ((l & 0xFFFFFF) >> 16 & 0xFF);
+                    bytes[2] = (byte) (int) ((l & 0xFFFF) >> 8 & 0xFF);
+                    bytes[3] = (byte) (int) (l & 0xFF);
+                    break;
+                case 2:
+                    l = Integer.parseInt(elements[0]);
+                    if ((l < 0L) || (l > 255L)) {
+                        return null;
+                    }
+                    bytes[0] = (byte) (int) (l & 0xFF);
+                    l = Integer.parseInt(elements[1]);
+                    if ((l < 0L) || (l > 16777215L)) {
+                        return null;
+                    }
+                    bytes[1] = (byte) (int) (l >> 16 & 0xFF);
+                    bytes[2] = (byte) (int) ((l & 0xFFFF) >> 8 & 0xFF);
+                    bytes[3] = (byte) (int) (l & 0xFF);
+                    break;
+                case 3:
+                    for (i = 0; i < 2; ++i) {
+                        l = Integer.parseInt(elements[i]);
+                        if ((l < 0L) || (l > 255L)) {
+                            return null;
+                        }
+                        bytes[i] = (byte) (int) (l & 0xFF);
+                    }
+                    l = Integer.parseInt(elements[2]);
+                    if ((l < 0L) || (l > 65535L)) {
+                        return null;
+                    }
+                    bytes[2] = (byte) (int) (l >> 8 & 0xFF);
+                    bytes[3] = (byte) (int) (l & 0xFF);
+                    break;
+                case 4:
+                    for (i = 0; i < 4; ++i) {
+                        l = Integer.parseInt(elements[i]);
+                        if ((l < 0L) || (l > 255L))
+                            return null;
+                        bytes[i] = (byte) (int) (l & 0xFF);
+                    }
+                    break;
+                default:
+                    return null;
+            }
+        } catch (NumberFormatException e) {
+            return null;
+        }
+        return bytes;
+    }
+
+    private static boolean internalIp(byte[] addr) {
+        if (addr == null || addr.length < 2) {
+            return true;
+        }
+        final byte b0 = addr[0];
+        final byte b1 = addr[1];
+        // 10.x.x.x/8
+        final byte section1 = 0x0A;
+        // 172.16.x.x/12
+        final byte section2 = (byte) 0xAC;
+        final byte section3 = (byte) 0x10;
+        final byte section4 = (byte) 0x1F;
+        // 192.168.x.x/16
+        final byte section5 = (byte) 0xC0;
+        final byte section6 = (byte) 0xA8;
+        switch (b0) {
+            case section1:
+                return true;
+            case section2:
+                if (b1 >= section3 && b1 <= section4) {
+                    return true;
+                }
+            case section5:
+                if (b1 == section6) {
+                    return true;
+                }
+            default:
+                return false;
         }
     }
 
