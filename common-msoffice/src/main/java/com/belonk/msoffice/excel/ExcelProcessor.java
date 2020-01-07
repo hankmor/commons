@@ -270,7 +270,7 @@ public class ExcelProcessor<T> {
         // 取出一共有多少个sheet.
         try {
             double sheetNo = Math.ceil(list.size() / (double) maxRows);
-            for (int index = 0; index <= sheetNo; index++) {
+            for (int index = 0; index < sheetNo; index++) {
                 createSheet(sheetNo, index);
 
                 // 产生一行
@@ -346,8 +346,8 @@ public class ExcelProcessor<T> {
         style.setBorderBottom(BorderStyle.THIN);
         style.setBottomBorderColor(IndexedColors.GREY_50_PERCENT.getIndex());
         Font dataFont = wb.createFont();
-        dataFont.setFontName("Arial");
-        dataFont.setFontHeightInPoints((short) 10);
+        dataFont.setFontName("宋体");
+        dataFont.setFontHeightInPoints((short) 11);
         style.setFont(dataFont);
         styles.put("data", style);
 
@@ -355,11 +355,11 @@ public class ExcelProcessor<T> {
         style.cloneStyleFrom(styles.get("data"));
         style.setAlignment(HorizontalAlignment.CENTER);
         style.setVerticalAlignment(VerticalAlignment.CENTER);
-        style.setFillForegroundColor(IndexedColors.GREY_50_PERCENT.getIndex());
+        style.setFillForegroundColor(IndexedColors.SKY_BLUE.getIndex());
         style.setFillPattern(FillPatternType.SOLID_FOREGROUND);
         Font headerFont = wb.createFont();
-        headerFont.setFontName("Arial");
-        headerFont.setFontHeightInPoints((short) 10);
+        headerFont.setFontName("黑体");
+        headerFont.setFontHeightInPoints((short) 11);
         headerFont.setBold(true);
         headerFont.setColor(IndexedColors.WHITE.getIndex());
         style.setFont(headerFont);

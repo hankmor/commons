@@ -41,7 +41,7 @@ public @interface Excel {
     /**
      * 导出时在excel中每个列的高度 单位为字符
      */
-    double height() default 14;
+    double height() default 16;
 
     /**
      * 导出时在excel中每个列的宽 单位为字符
