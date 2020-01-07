@@ -1,6 +1,7 @@
 package com.belonk.msoffice.excel;
 
 import com.belonk.commons.util.Converter;
+import com.belonk.commons.util.asserts.Assert;
 import com.belonk.commons.util.clazz.ReflectUtil;
 import com.belonk.commons.util.date.DateHelper;
 import com.belonk.commons.util.string.StringHelper;
@@ -61,7 +62,7 @@ public class ExcelProcessor<T> {
     /**
      * 导出类型（EXPORT:导出数据；IMPORT：导入模板）
      */
-    private Type type;
+    private Type type = Type.EXPORT;
 
     /**
      * 工作薄对象
@@ -115,6 +116,8 @@ public class ExcelProcessor<T> {
     }
 
     public void init(String sheetName, List<T> list, Type type) {
+        Assert.notNull(clazz, "Class<T> must not be null, please invoke setClazz() method at first.");
+        Assert.hasLength(sheetName);
         if (list == null) {
             list = new ArrayList<T>();
         }
