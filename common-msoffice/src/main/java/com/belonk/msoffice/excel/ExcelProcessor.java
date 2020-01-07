@@ -3,6 +3,7 @@ package com.belonk.msoffice.excel;
 import com.belonk.commons.util.Converter;
 import com.belonk.commons.util.clazz.ReflectUtil;
 import com.belonk.commons.util.date.DateHelper;
+import com.belonk.commons.util.string.StringHelper;
 import com.belonk.msoffice.annotation.Excel;
 import com.belonk.msoffice.annotation.Excel.Type;
 import com.belonk.msoffice.annotation.Excels;
@@ -39,10 +40,13 @@ import static com.belonk.msoffice.annotation.Excel.ColumnType;
 public class ExcelProcessor<T> {
     private static final Logger log = LoggerFactory.getLogger(ExcelProcessor.class);
 
-    /**
-     * 单张Sheet的最大行数，超过则会分Sheet。
-     */
-    private Integer maxRows;
+    private ExcelConfig excelConfig = new ExcelConfig();
+
+    private int maxRows;
+
+    private int titleRowStart;
+
+    private int dataRowStart = titleRowStart + 1;
 
     /**
      * Excel文件名称
@@ -89,17 +93,36 @@ public class ExcelProcessor<T> {
      */
     public Class<T> clazz;
 
+    public ExcelProcessor() {
+
+    }
+
+    public ExcelProcessor(ExcelConfig excelConfig) {
+    }
+
     public ExcelProcessor(Class<T> clazz) {
+
+    }
+
+    public ExcelProcessor(Class<T> clazz, ExcelConfig excelConfig) {
+        this.excelConfig = excelConfig;
+        if (excelConfig != null) {
+            this.maxRows = excelConfig.getMaxRows();
+            this.titleRowStart = excelConfig.getTitleRowStart();
+            this.dataRowStart = excelConfig.getDataRowStart();
+        }
         this.clazz = clazz;
     }
 
-    public void init(String fileName, String sheetName, List<T> list, Type type) {
+    public void init(String sheetName, List<T> list, Type type) {
         if (list == null) {
             list = new ArrayList<T>();
         }
         this.list = list;
-        this.fileName = fileName;
         this.sheetName = sheetName;
+        if (StringHelper.isEmpty(fileName)) {
+            this.fileName = sheetName;
+        }
         this.type = type;
         createExcelField();
         createWorkbook();
@@ -232,10 +255,9 @@ public class ExcelProcessor<T> {
      *
      * @param list      导出数据集合
      * @param sheetName 工作表的名称
-     * @param filename  excel文件的名称
      */
-    public void export(String filename, String sheetName, List<T> list, HttpServletRequest req, HttpServletResponse resp) {
-        this.init(fileName, sheetName, list, Type.EXPORT);
+    public void export(String sheetName, List<T> list, HttpServletRequest req, HttpServletResponse resp) {
+        this.init(sheetName, list, Type.EXPORT);
         // 取出一共有多少个sheet.
         try {
             double sheetNo = Math.ceil(list.size() / (double) maxRows);
@@ -243,7 +265,7 @@ public class ExcelProcessor<T> {
                 createSheet(sheetNo, index);
 
                 // 产生一行
-                Row row = sheet.createRow(0);
+                Row row = sheet.createRow(this.titleRowStart);
                 int column = 0;
                 // 写入各个字段的列头名称
                 for (Object[] os : fields) {
@@ -255,7 +277,7 @@ public class ExcelProcessor<T> {
                 }
             }
             resp.setContentType("application/x-download");
-            resp.setHeader("Content-Disposition", "attachment; filename=" + new String((filename + ".xlsx").getBytes(StandardCharsets.UTF_8), StandardCharsets.ISO_8859_1));
+            resp.setHeader("Content-Disposition", "attachment; filename=" + new String((this.fileName + ".xlsx").getBytes(StandardCharsets.UTF_8), StandardCharsets.ISO_8859_1));
             wb.write(resp.getOutputStream());
             resp.getOutputStream().flush();
             resp.getOutputStream().close();
@@ -280,7 +302,7 @@ public class ExcelProcessor<T> {
         int startNo = index * maxRows;
         int endNo = Math.min(startNo + maxRows, list.size());
         for (int i = startNo; i < endNo; i++) {
-            row = sheet.createRow(i + 1 - startNo);
+            row = sheet.createRow(i + this.dataRowStart - startNo);
             // 得到导出对象.
             T vo = (T) list.get(i);
             int column = 0;
@@ -669,6 +691,30 @@ public class ExcelProcessor<T> {
             return val;
         }
         return val;
+    }
+
+    public ExcelConfig getExcelConfig() {
+        return excelConfig;
+    }
+
+    public void setExcelConfig(ExcelConfig excelConfig) {
+        this.excelConfig = excelConfig;
+    }
+
+    public String getFileName() {
+        return fileName;
+    }
+
+    public void setFileName(String fileName) {
+        this.fileName = fileName;
+    }
+
+    public Class<T> getClazz() {
+        return clazz;
+    }
+
+    public void setClazz(Class<T> clazz) {
+        this.clazz = clazz;
     }
 
     public static void main(String[] args) throws IOException {
