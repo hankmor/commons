@@ -99,6 +99,11 @@ public class ExcelProcessor<T> {
     }
 
     public ExcelProcessor(ExcelConfig excelConfig) {
+        if (excelConfig != null) {
+            this.maxRows = excelConfig.getMaxRows();
+            this.titleRowStart = excelConfig.getTitleRowStart();
+            this.dataRowStart = excelConfig.getDataRowStart();
+        }
     }
 
     public ExcelProcessor(Class<T> clazz) {
@@ -118,6 +123,7 @@ public class ExcelProcessor<T> {
     public void init(String sheetName, List<T> list, Type type) {
         Assert.notNull(clazz, "Class<T> must not be null, please invoke setClazz() method at first.");
         Assert.hasLength(sheetName);
+        Assert.isTrue(this.maxRows > 0);
         if (list == null) {
             list = new ArrayList<T>();
         }
