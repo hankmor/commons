@@ -10,9 +10,9 @@ import com.belonk.msoffice.annotation.Excel.Type;
 import com.belonk.msoffice.annotation.Excels;
 import org.apache.commons.lang.StringUtils;
 import org.apache.poi.hssf.usermodel.HSSFDateUtil;
+import org.apache.poi.ss.formula.functions.T;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.CellRangeAddressList;
-import org.apache.poi.xssf.streaming.SXSSFSheet;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 import org.apache.poi.xssf.usermodel.XSSFDataValidation;
 import org.slf4j.Logger;
@@ -20,10 +20,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.math.BigDecimal;
@@ -92,46 +89,32 @@ public class ExcelProcessor<T> {
     /**
      * 实体对象
      */
-    public Class<T> clazz;
+    private Class<T> clazz;
 
     public ExcelProcessor() {
-
     }
 
     public ExcelProcessor(ExcelConfig excelConfig) {
         if (excelConfig != null) {
+            this.excelConfig = excelConfig;
             this.maxRows = excelConfig.getMaxRows();
             this.titleRowStart = excelConfig.getTitleRowStart();
             this.dataRowStart = excelConfig.getDataRowStart();
         }
     }
 
-    public ExcelProcessor(Class<T> clazz) {
-
-    }
-
-    public ExcelProcessor(Class<T> clazz, ExcelConfig excelConfig) {
-        this.excelConfig = excelConfig;
-        if (excelConfig != null) {
-            this.maxRows = excelConfig.getMaxRows();
-            this.titleRowStart = excelConfig.getTitleRowStart();
-            this.dataRowStart = excelConfig.getDataRowStart();
-        }
-        this.clazz = clazz;
-    }
-
-    public void init(String sheetName, List<T> list, Type type) {
+    private void init(String fileName, String sheetName, Class<T> clazz, List<T> list, Type type) {
         Assert.notNull(clazz, "Class<T> must not be null, please invoke setClazz() method at first.");
-        Assert.hasLength(sheetName);
-        Assert.isTrue(this.maxRows > 0);
+        Assert.hasLength(fileName, "Filename must not be empty.");
+        Assert.hasLength(sheetName, "SheetName must not be empty.");
+        Assert.isTrue(this.maxRows > 0, "Max rows number per sheet must be great then 0.");
         if (list == null) {
             list = new ArrayList<T>();
         }
-        this.list = list;
+        this.fileName = fileName;
         this.sheetName = sheetName;
-        if (StringHelper.isEmpty(fileName)) {
-            this.fileName = sheetName;
-        }
+        this.list = list;
+        this.clazz = clazz;
         this.type = type;
         createExcelField();
         createWorkbook();
@@ -157,7 +140,7 @@ public class ExcelProcessor<T> {
     public List<T> importExcel(String sheetName, InputStream is) throws Exception {
         this.type = Type.IMPORT;
         this.wb = WorkbookFactory.create(is);
-        List<T> list = new ArrayList<T>();
+        List<T> list = new ArrayList<>();
         Sheet sheet = null;
         if (StringUtils.isNotEmpty(sheetName)) {
             // 如果指定sheet名,则取指定sheet中的内容.
@@ -190,7 +173,7 @@ public class ExcelProcessor<T> {
             // 有数据时才处理 得到类的所有field.
             Field[] allFields = clazz.getDeclaredFields();
             // 定义一个map用于存放列的序号和field.
-            Map<Integer, Field> fieldsMap = new HashMap<Integer, Field>();
+            Map<Integer, Field> fieldsMap = new HashMap<>();
             for (int col = 0; col < allFields.length; col++) {
                 Field field = allFields[col];
                 Excel attr = field.getAnnotation(Excel.class);
@@ -215,7 +198,7 @@ public class ExcelProcessor<T> {
                     // 日期格式
                     String dateFormat = field.getAnnotation(Excel.class).dateFormat();
                     // 取得类型,并根据对象类型设置值.
-                    Class<?> fieldType = field.getType();
+                    Class<T> fieldType = (Class<T>) field.getType();
                     if (String.class == fieldType) {
                         String s = Converter.toStr(val);
                         if (StringUtils.endsWith(s, ".0")) {
@@ -249,7 +232,7 @@ public class ExcelProcessor<T> {
                     if (StringUtils.isNotEmpty(attr.associate())) {
                         propertyName = field.getName() + "." + attr.associate();
                     } else if (StringUtils.isNotEmpty(attr.contentFormat())) {
-                        val = reverseByExp(String.valueOf(val), attr.contentFormat());
+                        val = reverseByExp(attr, String.valueOf(val), attr.contentFormat());
                     }
                     ReflectUtil.invokeSetter(entity, propertyName, val);
                 }
@@ -260,43 +243,83 @@ public class ExcelProcessor<T> {
     }
 
     /**
-     * 对list数据源将其里面的数据导出到excel表单
+     * 对list数据源将其里面的数据导出到excel表单，excel文件存储到自定义目录。
      *
-     * @param list      导出数据集合
-     * @param sheetName 工作表的名称
+     * @param savePath  excel文件保存的位置
+     * @param fileName  excel文件名称，不带后缀
+     * @param sheetName excel导出sheet名称
+     * @param clazz     被导出的类
+     * @param list      被导出的数据列表
      */
-    public void export(String sheetName, List<T> list, HttpServletRequest req, HttpServletResponse resp) {
-        this.init(sheetName, list, Type.EXPORT);
-        // 取出一共有多少个sheet.
-        try {
-            double sheetNo = Math.ceil(list.size() / (double) maxRows);
-            for (int index = 0; index < sheetNo; index++) {
-                createSheet(sheetNo, index);
+    public void export(String savePath, String fileName, String sheetName, Class<T> clazz, List<T> list) {
+        Assert.hasLength(savePath, "File save path must not be empty.");
+        this.init(fileName, sheetName, clazz, list, Type.EXPORT);
+        processData(list);
+        saveFile(savePath, null, null);
+    }
 
-                // 产生一行
-                Row row = sheet.createRow(this.titleRowStart);
-                int column = 0;
-                // 写入各个字段的列头名称
-                for (Object[] os : fields) {
-                    Excel excel = (Excel) os[1];
-                    this.createCell(excel, row, column++);
+    /**
+     * 对list数据源将其里面的数据导出到excel表单, Http请求时直接保存，不会存储到服务器。
+     *
+     * @param fileName  excel文件名称，不带后缀
+     * @param sheetName excel导出sheet名称
+     * @param clazz     被导出的类
+     * @param list      被导出的数据列表
+     * @param req       http请求
+     * @param resp      http响应
+     */
+    public void export(String fileName, String sheetName, Class<T> clazz, List<T> list, HttpServletRequest req, HttpServletResponse resp) {
+        this.init(fileName, sheetName, clazz, list, Type.EXPORT);
+        processData(list);
+        saveFile(null, req, resp);
+    }
+
+    private void saveFile(String savePath, HttpServletRequest req, HttpServletResponse resp) {
+        OutputStream out = null;
+        try {
+            if (StringHelper.isNotEmpty(savePath)) {
+                if (!savePath.endsWith(File.separator)) {
+                    savePath += File.separator;
                 }
-                if (Type.EXPORT.equals(type)) {
-                    fillExcelData(index, row);
-                }
+                out = new FileOutputStream(savePath + fileName + ".xlsx");
+                wb.write(out);
+            } else {
+                resp.setContentType("application/x-download");
+                resp.setHeader("Content-Disposition", "attachment; filename=" + new String((getFileName() + ".xlsx")
+                        .getBytes(StandardCharsets.UTF_8), StandardCharsets.ISO_8859_1));
+                wb.write(resp.getOutputStream());
+                resp.getOutputStream().flush();
+                resp.getOutputStream().close();
             }
-            resp.setContentType("application/x-download");
-            resp.setHeader("Content-Disposition", "attachment; filename=" + new String((this.fileName + ".xlsx").getBytes(StandardCharsets.UTF_8), StandardCharsets.ISO_8859_1));
-            wb.write(resp.getOutputStream());
-            resp.getOutputStream().flush();
-            resp.getOutputStream().close();
         } catch (Exception e) {
             log.error("Export exception : ", e);
         } finally {
             try {
                 wb.close();
+                if (out != null) {
+                    out.close();
+                }
             } catch (IOException e) {
                 e.printStackTrace();
+            }
+        }
+    }
+
+    private <T> void processData(List<T> list) {
+        double sheetNo = Math.ceil(list.size() / (double) maxRows);
+        for (int index = 0; index < sheetNo; index++) {
+            createSheet(sheetNo, index);
+
+            // 产生一行
+            Row row = sheet.createRow(this.titleRowStart);
+            int column = 0;
+            // 写入各个字段的列头名称
+            for (Object[] os : fields) {
+                Excel excel = (Excel) os[1];
+                this.createCell(excel, row, column++);
+            }
+            if (Type.EXPORT.equals(type)) {
+                fillExcelData(index, row);
             }
         }
     }
@@ -307,7 +330,7 @@ public class ExcelProcessor<T> {
      * @param index 序号
      * @param row   单元格行
      */
-    public void fillExcelData(int index, Row row) {
+    private void fillExcelData(int index, Row row) {
         int startNo = index * maxRows;
         int endNo = Math.min(startNo + maxRows, list.size());
         for (int i = startNo; i < endNo; i++) {
@@ -335,7 +358,7 @@ public class ExcelProcessor<T> {
         // 写入各条记录,每条记录对应excel表中的一行
         Map<String, CellStyle> styles = new HashMap<String, CellStyle>();
         CellStyle style = wb.createCellStyle();
-        style.setAlignment(HorizontalAlignment.CENTER);
+        style.setAlignment(HorizontalAlignment.GENERAL);
         style.setVerticalAlignment(VerticalAlignment.CENTER);
         style.setBorderRight(BorderStyle.THIN);
         style.setRightBorderColor(IndexedColors.GREY_50_PERCENT.getIndex());
@@ -371,13 +394,16 @@ public class ExcelProcessor<T> {
     /**
      * 创建单元格
      */
-    public Cell createCell(Excel attr, Row row, int column) {
+    private Cell createCell(Excel attr, Row row, int column) {
         // 创建列
         Cell cell = row.createCell(column);
         // 写入列信息
         cell.setCellValue(attr.title());
         setDataValidation(attr, row, column);
-        cell.setCellStyle(styles.get("header"));
+        CellStyle style = styles.get("header");
+        style.setAlignment(attr.align());
+        style.setVerticalAlignment(attr.verticalAlign());
+        cell.setCellStyle(style);
         return cell;
     }
 
@@ -388,7 +414,7 @@ public class ExcelProcessor<T> {
      * @param attr  注解相关
      * @param cell  单元格信息
      */
-    public void setCellVo(Object value, Excel attr, Cell cell) {
+    private void setCellVo(Object value, Excel attr, Cell cell) {
         if (ColumnType.STRING == attr.cellType()) {
             cell.setCellType(CellType.NUMERIC);
             cell.setCellValue(value == null ? attr.defaultValue() : attr.prefix() + value + attr.suffix());
@@ -401,7 +427,7 @@ public class ExcelProcessor<T> {
     /**
      * 创建表格样式
      */
-    public void setDataValidation(Excel attr, Row row, int column) {
+    private void setDataValidation(Excel attr, Row row, int column) {
         if (attr.title().contains("注：")) {
             sheet.setColumnWidth(column, 6000);
         } else {
@@ -424,7 +450,7 @@ public class ExcelProcessor<T> {
     /**
      * 添加单元格
      */
-    public Cell addCell(Excel attr, Row row, T vo, Field field, int column) {
+    private Cell addCell(Excel attr, Row row, T vo, Field field, int column) {
         Cell cell = null;
         try {
             // 设置行高
@@ -433,7 +459,10 @@ public class ExcelProcessor<T> {
             if (attr.export()) {
                 // 创建cell
                 cell = row.createCell(column);
-                cell.setCellStyle(styles.get("data"));
+                CellStyle style = styles.get("data");
+                style.setAlignment(attr.align());
+                style.setVerticalAlignment(attr.verticalAlign());
+                cell.setCellStyle(style);
 
                 // 用于读取对象中的属性
                 Object value = getTargetValue(vo, field, attr);
@@ -442,7 +471,7 @@ public class ExcelProcessor<T> {
                 if (StringUtils.isNotEmpty(dateFormat) && value != null) {
                     cell.setCellValue(DateHelper.format((Date) value, dateFormat));
                 } else if (StringUtils.isNotEmpty(readConverterExp) && value != null) {
-                    cell.setCellValue(convertByExp(String.valueOf(value), readConverterExp));
+                    cell.setCellValue(convertByExp(attr, String.valueOf(value), readConverterExp));
                 } else {
                     // 设置列类型
                     setCellVo(value, attr, cell);
@@ -465,8 +494,8 @@ public class ExcelProcessor<T> {
      * @param firstCol      开始列
      * @param endCol        结束列
      */
-    public void setXSSFPrompt(Sheet sheet, String promptTitle, String promptContent, int firstRow, int endRow,
-                              int firstCol, int endCol) {
+    private void setXSSFPrompt(Sheet sheet, String promptTitle, String promptContent, int firstRow, int endRow,
+                               int firstCol, int endCol) {
         DataValidationHelper helper = sheet.getDataValidationHelper();
         DataValidationConstraint constraint = helper.createCustomConstraint("DD1");
         CellRangeAddressList regions = new CellRangeAddressList(firstRow, endRow, firstCol, endCol);
@@ -487,7 +516,7 @@ public class ExcelProcessor<T> {
      * @param endCol   结束列
      * @return 设置好的sheet.
      */
-    public void setXSSFValidation(Sheet sheet, String[] textlist, int firstRow, int endRow, int firstCol, int endCol) {
+    private void setXSSFValidation(Sheet sheet, String[] textlist, int firstRow, int endRow, int firstCol, int endCol) {
         DataValidationHelper helper = sheet.getDataValidationHelper();
         // 加载下拉列表内容
         DataValidationConstraint constraint = helper.createExplicitListConstraint(textlist);
@@ -509,22 +538,18 @@ public class ExcelProcessor<T> {
     /**
      * 解析导出值 0=男,1=女,2=未知
      *
+     * @param attr          Excel注解
      * @param propertyValue 参数值
      * @param converterExp  翻译注解
      * @return 解析后值
-     * @throws Exception
      */
-    public static String convertByExp(String propertyValue, String converterExp) throws Exception {
-        try {
-            String[] convertSource = converterExp.split(",");
-            for (String item : convertSource) {
-                String[] itemArray = item.split("=");
-                if (itemArray[0].equals(propertyValue)) {
-                    return itemArray[1];
-                }
+    private static String convertByExp(Excel attr, String propertyValue, String converterExp) {
+        String[] convertSource = converterExp.split(attr.contentDelimiter());
+        for (String item : convertSource) {
+            String[] itemArray = item.split(attr.contentKeyValueDelimiter());
+            if (itemArray[0].equals(propertyValue)) {
+                return itemArray[1];
             }
-        } catch (Exception e) {
-            throw e;
         }
         return propertyValue;
     }
@@ -532,16 +557,16 @@ public class ExcelProcessor<T> {
     /**
      * 反向解析值 男=0,女=1,未知=2
      *
+     * @param attr          Excel注解
      * @param propertyValue 参数值
      * @param converterExp  翻译注解
      * @return 解析后值
-     * @throws Exception
      */
-    public static String reverseByExp(String propertyValue, String converterExp) throws Exception {
+    private static String reverseByExp(Excel attr, String propertyValue, String converterExp) {
         try {
-            String[] convertSource = converterExp.split(",");
+            String[] convertSource = converterExp.split(attr.contentDelimiter());
             for (String item : convertSource) {
-                String[] itemArray = item.split("=");
+                String[] itemArray = item.split(attr.contentKeyValueDelimiter());
                 if (itemArray[1].equals(propertyValue)) {
                     return itemArray[0];
                 }
@@ -595,7 +620,7 @@ public class ExcelProcessor<T> {
      */
     private Object getValue(Object o, String name) throws Exception {
         if (StringUtils.isNotEmpty(name)) {
-            Class<?> clazz = o.getClass();
+            Class<T> clazz = (Class<T>) o.getClass();
             String methodName = "get" + name.substring(0, 1).toUpperCase() + name.substring(1);
             Method method = clazz.getMethod(methodName);
             o = method.invoke(o);
@@ -640,7 +665,7 @@ public class ExcelProcessor<T> {
     /**
      * 创建一个工作簿
      */
-    public void createWorkbook() {
+    private void createWorkbook() {
         this.wb = new SXSSFWorkbook(500);
     }
 
@@ -650,7 +675,7 @@ public class ExcelProcessor<T> {
      * @param sheetNo sheet数量
      * @param index   序号
      */
-    public void createSheet(double sheetNo, int index) {
+    private void createSheet(double sheetNo, int index) {
         this.sheet = wb.createSheet();
         this.styles = createStyles(wb);
         // 设置工作表的名称.
@@ -668,7 +693,7 @@ public class ExcelProcessor<T> {
      * @param column 获取单元格列号
      * @return 单元格值
      */
-    public Object getCellValue(Row row, int column) {
+    private Object getCellValue(Row row, int column) {
         if (row == null) {
             return row;
         }
@@ -706,59 +731,39 @@ public class ExcelProcessor<T> {
         return excelConfig;
     }
 
-    public void setExcelConfig(ExcelConfig excelConfig) {
-        this.excelConfig = excelConfig;
+    public int getMaxRows() {
+        return maxRows;
+    }
+
+    public int getTitleRowStart() {
+        return titleRowStart;
+    }
+
+    public int getDataRowStart() {
+        return dataRowStart;
     }
 
     public String getFileName() {
         return fileName;
     }
 
-    public void setFileName(String fileName) {
-        this.fileName = fileName;
+    public String getSheetName() {
+        return sheetName;
+    }
+
+    public Type getType() {
+        return type;
+    }
+
+    public List<T> getList() {
+        return list;
+    }
+
+    public List<Object[]> getFields() {
+        return fields;
     }
 
     public Class<T> getClazz() {
         return clazz;
-    }
-
-    public void setClazz(Class<T> clazz) {
-        this.clazz = clazz;
-    }
-
-    public static void main(String[] args) throws IOException {
-        SXSSFWorkbook wb = new SXSSFWorkbook(10);
-        int size = 10000;
-        int maxRows = 1000;
-        int cols = 5;
-        int sheetNo = (int) Math.ceil(size / maxRows);
-        for (int index = 0; index < sheetNo; index++) {
-            SXSSFSheet sheet = wb.createSheet();
-            wb.setSheetName(index, "sheet_" + index);
-
-            Row row = sheet.createRow(0);
-            // 写入各个字段的列头名称
-            for (int col = 0; col < cols; col++) {
-                // 创建列
-                Cell cell = row.createCell(col);
-                // 写入列信息
-                cell.setCellValue("col_" + col);
-            }
-            int startNo = index * maxRows;
-            int endNo = Math.min(startNo + maxRows, size);
-            for (int i = startNo; i < endNo; i++) {
-                row = sheet.createRow(i + 1 - startNo);
-                int column = 0;
-                for (int col = 0; col < cols; col++) {
-                    // 创建cell
-                    Cell cell = row.createCell(column++);
-                    // 用于读取对象中的属性
-                    cell.setCellType(CellType.STRING);
-                    cell.setCellValue("row_" + i + "_" + col);
-                }
-            }
-        }
-        OutputStream out = new FileOutputStream("test.xlsx");
-        wb.write(out);
     }
 }

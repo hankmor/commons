@@ -1,5 +1,8 @@
 package com.belonk.msoffice.annotation;
 
+import org.apache.poi.ss.usermodel.HorizontalAlignment;
+import org.apache.poi.ss.usermodel.VerticalAlignment;
+
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -34,7 +37,27 @@ public @interface Excel {
     String contentFormat() default "";
 
     /**
-     * 导出类型（0数字 1字符串）
+     * 不同内容间分隔符
+     */
+    String contentDelimiter() default ",";
+
+    /**
+     * 内容的key=value分隔符
+     */
+    String contentKeyValueDelimiter() default "=";
+
+    /**
+     * 水平对齐方式
+     */
+    HorizontalAlignment align() default HorizontalAlignment.GENERAL;
+
+    /**
+     * 垂直对齐方式
+     */
+    VerticalAlignment verticalAlign() default VerticalAlignment.CENTER;
+
+    /**
+     * 导出类型
      */
     ColumnType cellType() default ColumnType.STRING;
 
@@ -74,10 +97,13 @@ public @interface Excel {
     String[] combo() default {};
 
     /**
-     * 字段类型（0：导出导入；1：仅导出；2：仅导入）
+     * 字段类型
      */
     Type type() default Type.ALL;
 
+    /**
+     * 被标注字段是否导出
+     */
     boolean export() default true;
 
     enum Type {
