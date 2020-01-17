@@ -10,7 +10,6 @@ import com.belonk.msoffice.annotation.Excel.Type;
 import com.belonk.msoffice.annotation.Excels;
 import org.apache.commons.lang.StringUtils;
 import org.apache.poi.hssf.usermodel.HSSFDateUtil;
-import org.apache.poi.ss.formula.functions.T;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.CellRangeAddressList;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
@@ -123,11 +122,12 @@ public class ExcelProcessor<T> {
     /**
      * 对excel表单默认第一个索引名转换成list
      *
-     * @param is 输入流
+     * @param is    输入流
+     * @param clazz 实体类
      * @return 转换后集合
      */
-    public List<T> importExcel(InputStream is) throws Exception {
-        return importExcel(StringUtils.EMPTY, is);
+    public List<T> importExcel(InputStream is, Class<T> clazz) throws Exception {
+        return importExcel(StringUtils.EMPTY, is, clazz);
     }
 
     /**
@@ -135,9 +135,10 @@ public class ExcelProcessor<T> {
      *
      * @param sheetName 表格索引名
      * @param is        输入流
+     * @param clazz     实体类
      * @return 转换后集合
      */
-    public List<T> importExcel(String sheetName, InputStream is) throws Exception {
+    public List<T> importExcel(String sheetName, InputStream is, Class<T> clazz) throws Exception {
         this.type = Type.IMPORT;
         this.wb = WorkbookFactory.create(is);
         List<T> list = new ArrayList<>();
@@ -158,7 +159,7 @@ public class ExcelProcessor<T> {
 
         if (rows > 0) {
             // 定义一个map用于存放excel列的序号和field.
-            Map<String, Integer> cellMap = new HashMap<String, Integer>();
+            Map<String, Integer> cellMap = new HashMap<>();
             // 获取表头
             Row head = sheet.getRow(0);
             for (int i = 0; i < head.getPhysicalNumberOfCells(); i++) {
@@ -184,7 +185,7 @@ public class ExcelProcessor<T> {
                     fieldsMap.put(column, field);
                 }
             }
-            for (int i = 1; i < rows; i++) {
+            for (int i = this.dataRowStart; i < rows; i++) {
                 // 从第2行开始取数据,默认第一行是表头.
                 Row row = sheet.getRow(i);
                 T entity = null;
