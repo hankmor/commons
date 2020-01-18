@@ -26,6 +26,7 @@ import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
 import java.text.DecimalFormat;
 import java.util.*;
+import java.util.function.Consumer;
 
 import static com.belonk.msoffice.annotation.Excel.ColumnType;
 
@@ -131,6 +132,37 @@ public class ExcelProcessor<T> {
     }
 
     /**
+     * 从excel导入数据，读取后处理的逻辑由<code>consumer</code>参数决定。
+     * <p>
+     * 每读取一行，都会将数据交由<code>conmsumer</code>处理.
+     *
+     * @param is       文件流
+     * @param clazz    excel数据对应的对象
+     * @param consumer 消费者，处理数据
+     * @throws Exception
+     */
+    public void importExcel(InputStream is, Class<T> clazz, Consumer<T> consumer) throws Exception {
+        Assert.notNull(consumer);
+        importExcel(StringUtils.EMPTY, is, clazz, consumer);
+    }
+
+    /**
+     * 从excel导入数据，读取后处理的逻辑由<code>consumer</code>参数决定。
+     * <p>
+     * 每读取一行，都会将数据交由<code>conmsumer</code>处理.
+     *
+     * @param sheetName 要导入的excel sheet名称，如果为空，则导入第一个
+     * @param is        文件流
+     * @param clazz     excel数据对应的对象
+     * @param consumer  消费者，处理数据
+     * @throws Exception
+     */
+    public void importExcel(String sheetName, InputStream is, Class<T> clazz, Consumer<T> consumer) throws Exception {
+        Assert.notNull(consumer);
+        processImport(sheetName, is, clazz, consumer);
+    }
+
+    /**
      * 对excel表单指定表格索引名转换成list
      *
      * @param sheetName 表格索引名
@@ -139,9 +171,13 @@ public class ExcelProcessor<T> {
      * @return 转换后集合
      */
     public List<T> importExcel(String sheetName, InputStream is, Class<T> clazz) throws Exception {
+        return processImport(sheetName, is, clazz, null);
+    }
+
+    private List<T> processImport(String sheetName, InputStream is, Class<T> clazz, Consumer<T> consumer) throws Exception {
         this.type = Type.IMPORT;
         this.wb = WorkbookFactory.create(is);
-        List<T> list = new ArrayList<>();
+        List<T> data = new ArrayList<>();
         Sheet sheet = null;
         if (StringUtils.isNotEmpty(sheetName)) {
             // 如果指定sheet名,则取指定sheet中的内容.
@@ -237,10 +273,14 @@ public class ExcelProcessor<T> {
                     }
                     ReflectUtil.invokeSetter(entity, propertyName, val);
                 }
-                list.add(entity);
+                if (consumer != null) {
+                    consumer.accept(entity);
+                } else {
+                    data.add(entity);
+                }
             }
         }
-        return list;
+        return data;
     }
 
     /**
