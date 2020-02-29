@@ -217,6 +217,18 @@ public class DateHelperTest {
 		period = 7;
 		dateTuples = DateHelper.splitDatePeriodByDays(start, stop, period);
 		System.out.println(dateTuples.size());
+
+        start = DateHelper.from("2020-01-01", DateFormatEnum.YYYY_MM_DD);
+        stop = DateHelper.from("2020-01-01", DateFormatEnum.YYYY_MM_DD);
+        period = 1;
+        dateTuples = DateHelper.splitDatePeriodByDays(start, stop, period);
+        System.out.println(dateTuples.size());
+
+        start = DateHelper.from("2020-01-01", DateFormatEnum.YYYY_MM_DD);
+        stop = DateHelper.from("2020-01-02", DateFormatEnum.YYYY_MM_DD);
+        period = 1;
+        dateTuples = DateHelper.splitDatePeriodByDays(start, stop, period);
+        System.out.println(dateTuples.size());
 	}
 
 	/*

@@ -345,7 +345,7 @@ public final class DateHelper {
 	public static List<DateTuple> splitDatePeriodByDays(Date start, Date stop, int days) {
 		Assert.notNull(start, "Start date must not be null.");
 		Assert.notNull(stop, "Stop date must not be null.");
-		Assert.isTrue(start.compareTo(stop) < 0, "Start date must be less then stop date.");
+		Assert.isTrue(start.compareTo(stop) <= 0, "Start date must be less then or equals stop date.");
 		Assert.isTrue(days > 0, "Days must be great then zero.");
 
 		start = DateHelper.startOfDay(start);
