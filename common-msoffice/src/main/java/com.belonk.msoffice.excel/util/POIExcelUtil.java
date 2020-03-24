@@ -451,7 +451,7 @@ public class POIExcelUtil {
                     errorList.add(errorValueList);
                 }
 
-                if (CollectionHelper.notNull(cellValueList)) {
+                if (cellValueList != null) {
                     list.add(cellValueList);
                 }
             }
