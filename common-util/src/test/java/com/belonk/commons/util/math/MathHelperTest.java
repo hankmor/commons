@@ -1,7 +1,5 @@
 package com.belonk.commons.util.math;
 
-import com.belonk.commons.util.asserts.Assert;
-
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 
@@ -11,7 +9,7 @@ import java.math.RoundingMode;
  * @author sunfuchang03@126.com
  * @since 1.0
  */
-public final class MathHelper {
+public class MathHelperTest {
 	/*
 	 * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	 *
@@ -50,22 +48,15 @@ public final class MathHelper {
 	 * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	 */
 
-	public static BigDecimal divide(BigDecimal dividend, BigDecimal divisor) {
-		return divide(dividend, divisor, 2, RoundingMode.HALF_UP);
-	}
-
-	public static BigDecimal divide(BigDecimal dividend, BigDecimal divisor, int scale) {
-		return divide(dividend, divisor, scale, RoundingMode.HALF_UP);
-	}
-
-	public static BigDecimal divide(BigDecimal dividend, BigDecimal divisor, RoundingMode roundingMode) {
-		return divide(dividend, divisor, 0, roundingMode);
-	}
-
-	public static BigDecimal divide(BigDecimal dividend, BigDecimal divisor, int scale, RoundingMode roundingMode) {
-		Assert.notNull(dividend, "The dividend must not be null.");
-		Assert.notNull(divisor, "The divisor must not be null.");
-		Assert.isTrue(BigDecimal.ZERO.compareTo(divisor) != 0, "The divisor must great then zero");
-		return dividend.divide(divisor, scale, roundingMode);
+	public static void main(String[] args) {
+		BigDecimal a = new BigDecimal("10");
+		BigDecimal b = new BigDecimal("4");
+		assert new BigDecimal("0.25").compareTo(MathHelper.divide(a, b)) == 0;
+		assert new BigDecimal("0.3").compareTo(MathHelper.divide(a, b, 1)) == 0;
+		assert new BigDecimal("0.2").compareTo(MathHelper.divide(a, b, RoundingMode.HALF_DOWN)) == 0;
+		assert new BigDecimal("0.25").compareTo(MathHelper.divide(a, b, 3, RoundingMode.HALF_DOWN)) == 0;
+		a = new BigDecimal("10");
+		b = new BigDecimal("0");
+		// MathHelper.divide(a, b);
 	}
 }
