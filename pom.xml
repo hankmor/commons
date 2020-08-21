@@ -102,6 +102,7 @@
         <module>common-lang</module>
         <module>common-json</module>
         <module>common-map</module>
+        <module>common-emoji</module>
     </modules>
 
     <!--公用属性定义-->
@@ -325,6 +326,12 @@
             <artifactId>lombok</artifactId>
             <version>1.16.20</version>
             <optional>true</optional>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter</artifactId>
+            <version>5.5.2</version>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 
