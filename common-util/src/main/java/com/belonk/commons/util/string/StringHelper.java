@@ -6,6 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.UUID;
+import java.util.regex.Pattern;
 
 /**
  * 通用字符串处理工具类。
@@ -20,6 +21,14 @@ public class StringHelper extends StringUtils {
 
 	private static final Logger LOG = LoggerFactory.getLogger(StringHelper.class);
 
+	/**
+	 * 中文汉字正则
+	 */
+	public static final Pattern CHINESE_PATTERN = Pattern.compile("[\\u4E00-\\u9FBF]");
+	/**
+	 * 字母、数字、下划线
+	 */
+	public static final Pattern WORD_NUMBER_UNDERSCORE_PATTERN = Pattern.compile("\\w");
 
 	//~ Instance fields ================================================================================================
 
@@ -260,5 +269,55 @@ public class StringHelper extends StringUtils {
 			str = str.substring(trimmedStr.length());
 		}
 		return str;
+	}
+
+	/**
+	 * 保留有效字符，去除非法字母。有效字符包括：数字、字母、下划线
+	 *
+	 * @param str 字符串
+	 * @return 去除后的字符串
+	 * @since 2.0
+	 */
+	public static String remainValidChars(String str) {
+		if (isEmpty(str)) {
+			return str;
+		}
+		StringBuilder builder = new StringBuilder();
+		char[] chars = str.toCharArray();
+		for (char c : chars) {
+			if (WORD_NUMBER_UNDERSCORE_PATTERN.matcher(c + "").matches()) {
+				builder.append(c);
+			}
+		}
+		return builder.toString();
+	}
+
+	/**
+	 * 保留有效字符和中文。有效字符包括：数字、字母、下划线
+	 *
+	 * @param str 字符串
+	 * @return 去除后的字符串
+	 * @since 2.0
+	 */
+	public static String remainValidCharsAndChinese(String str) {
+		if (isEmpty(str)) {
+			return str;
+		}
+		StringBuilder builder = new StringBuilder();
+		char[] chars = str.toCharArray();
+		for (char c : chars) {
+			if (CHINESE_PATTERN.matcher(c + "").matches()) {
+				builder.append(c);
+			} else if (WORD_NUMBER_UNDERSCORE_PATTERN.matcher(c + "").matches()) {
+				builder.append(c);
+			}
+		}
+		return builder.toString();
+	}
+
+	public static void main(String[] args) {
+		String s = ":palm_tree:ヾ冷:leaves:鋒へ。123";
+		System.out.println(StringHelper.remainValidChars(s));
+		System.out.println(StringHelper.remainValidCharsAndChinese(s));
 	}
 }

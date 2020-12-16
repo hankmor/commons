@@ -63,8 +63,13 @@ public class PinyinHelper {
 		for (char c : arr) {
 			if (c > 128) {
 				try {
-					pybf.append(net.sourceforge.pinyin4j.PinyinHelper.toHanyuPinyinStringArray(c, defaultFormat)[0]);
-				} catch (BadHanyuPinyinOutputFormatCombination e) {
+					String[] strings = net.sourceforge.pinyin4j.PinyinHelper.toHanyuPinyinStringArray(c, defaultFormat);
+					if (strings == null || strings.length == 0) {
+						// 跳过，可能是个特殊字符
+					} else {
+						pybf.append(strings[0]);
+					}
+				} catch (Exception e) {
 					e.printStackTrace();
 				}
 			} else {
