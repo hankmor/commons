@@ -177,8 +177,8 @@ public class ExcelProcessor<T> {
 	private List<T> processImport(String sheetName, InputStream is, Class<T> clazz, Consumer<T> consumer) throws Exception {
 		this.type = Type.IMPORT;
 		this.wb = WorkbookFactory.create(is);
-		List<T> data  = new ArrayList<>();
-		Sheet   sheet = null;
+		List<T> data = new ArrayList<>();
+		Sheet sheet = null;
 		if (StringUtils.isNotEmpty(sheetName)) {
 			// 如果指定sheet名,则取指定sheet中的内容.
 			sheet = wb.getSheet(sheetName);
@@ -213,7 +213,7 @@ public class ExcelProcessor<T> {
 			Map<Integer, Field> fieldsMap = new HashMap<>();
 			for (int col = 0; col < allFields.length; col++) {
 				Field field = allFields[col];
-				Excel attr  = field.getAnnotation(Excel.class);
+				Excel attr = field.getAnnotation(Excel.class);
 				if (attr != null && (attr.type() == Type.ALL || attr.type() == type)) {
 					// 设置类的私有字段属性可访问.
 					field.setAccessible(true);
@@ -223,8 +223,8 @@ public class ExcelProcessor<T> {
 			}
 			for (int i = this.dataRowStart; i < rows; i++) {
 				// 从第2行开始取数据,默认第一行是表头.
-				Row row    = sheet.getRow(i);
-				T   entity = null;
+				Row row = sheet.getRow(i);
+				T entity = null;
 				for (Map.Entry<Integer, Field> entry : fieldsMap.entrySet()) {
 					Object val = this.getCellValue(row, entry.getKey());
 
@@ -264,7 +264,7 @@ public class ExcelProcessor<T> {
 							val = DateUtil.getJavaDate((Double) val);
 						}
 					}
-					Excel  attr         = field.getAnnotation(Excel.class);
+					Excel attr = field.getAnnotation(Excel.class);
 					String propertyName = field.getName();
 					if (StringUtils.isNotEmpty(attr.associate())) {
 						propertyName = field.getName() + "." + attr.associate();
@@ -336,6 +336,10 @@ public class ExcelProcessor<T> {
 			log.error("Export exception : ", e);
 		} finally {
 			try {
+				// 清理临时文件
+				if (wb instanceof SXSSFWorkbook) {
+					((SXSSFWorkbook) wb).dispose();
+				}
 				wb.close();
 				if (out != null) {
 					out.close();
@@ -352,7 +356,7 @@ public class ExcelProcessor<T> {
 			createSheet(sheetNo, index);
 
 			// 产生一行
-			Row row    = sheet.createRow(this.titleRowStart);
+			Row row = sheet.createRow(this.titleRowStart);
 			int column = 0;
 			// 写入各个字段的列头名称
 			for (Object[] os : fields) {
@@ -373,11 +377,11 @@ public class ExcelProcessor<T> {
 	 */
 	private void fillExcelData(int index, Row row) {
 		int startNo = index * maxRows;
-		int endNo   = Math.min(startNo + maxRows, list.size());
+		int endNo = Math.min(startNo + maxRows, list.size());
 		for (int i = startNo; i < endNo; i++) {
 			row = sheet.createRow(i + this.dataRowStart - startNo);
 			// 得到导出对象.
-			T   vo     = (T) list.get(i);
+			T vo = (T) list.get(i);
 			int column = 0;
 			for (Object[] os : fields) {
 				Field field = (Field) os[0];
@@ -398,7 +402,7 @@ public class ExcelProcessor<T> {
 	private Map<String, CellStyle> createStyles(Workbook wb) {
 		// 写入各条记录,每条记录对应excel表中的一行
 		Map<String, CellStyle> styles = new HashMap<String, CellStyle>();
-		CellStyle              style  = wb.createCellStyle();
+		CellStyle style = wb.createCellStyle();
 		style.setAlignment(HorizontalAlignment.GENERAL);
 		style.setVerticalAlignment(VerticalAlignment.CENTER);
 		style.setBorderRight(BorderStyle.THIN);
@@ -506,8 +510,8 @@ public class ExcelProcessor<T> {
 				cell.setCellStyle(style);
 
 				// 用于读取对象中的属性
-				Object value            = getTargetValue(vo, field, attr);
-				String dateFormat       = attr.dateFormat();
+				Object value = getTargetValue(vo, field, attr);
+				String dateFormat = attr.dateFormat();
 				String readConverterExp = attr.contentFormat();
 				if (StringUtils.isNotEmpty(dateFormat) && value != null) {
 					cell.setCellValue(DateHelper.format((Date) value, dateFormat));
@@ -537,10 +541,10 @@ public class ExcelProcessor<T> {
 	 */
 	private void setXSSFPrompt(Sheet sheet, String promptTitle, String promptContent, int firstRow, int endRow,
 	                           int firstCol, int endCol) {
-		DataValidationHelper     helper         = sheet.getDataValidationHelper();
-		DataValidationConstraint constraint     = helper.createCustomConstraint("DD1");
-		CellRangeAddressList     regions        = new CellRangeAddressList(firstRow, endRow, firstCol, endCol);
-		DataValidation           dataValidation = helper.createValidation(constraint, regions);
+		DataValidationHelper helper = sheet.getDataValidationHelper();
+		DataValidationConstraint constraint = helper.createCustomConstraint("DD1");
+		CellRangeAddressList regions = new CellRangeAddressList(firstRow, endRow, firstCol, endCol);
+		DataValidation dataValidation = helper.createValidation(constraint, regions);
 		dataValidation.createPromptBox(promptTitle, promptContent);
 		dataValidation.setShowPromptBox(true);
 		sheet.addValidationData(dataValidation);
@@ -665,9 +669,9 @@ public class ExcelProcessor<T> {
 	 */
 	private Object getValue(Object o, String name) throws Exception {
 		if (StringUtils.isNotEmpty(name)) {
-			Class<T> clazz      = (Class<T>) o.getClass();
-			String   methodName = "get" + name.substring(0, 1).toUpperCase() + name.substring(1);
-			Method   method     = clazz.getMethod(methodName);
+			Class<T> clazz = (Class<T>) o.getClass();
+			String methodName = "get" + name.substring(0, 1).toUpperCase() + name.substring(1);
+			Method method = clazz.getMethod(methodName);
 			o = method.invoke(o);
 		}
 		return o;
@@ -689,7 +693,7 @@ public class ExcelProcessor<T> {
 
 			// 多注解
 			if (field.isAnnotationPresent(Excels.class)) {
-				Excels  attrs  = field.getAnnotation(Excels.class);
+				Excels attrs = field.getAnnotation(Excels.class);
 				Excel[] excels = attrs.value();
 				for (Excel excel : excels) {
 					putToField(field, excel);
@@ -711,7 +715,7 @@ public class ExcelProcessor<T> {
 	 * 创建一个工作簿
 	 */
 	private void createWorkbook() {
-		this.wb = new SXSSFWorkbook(500);
+		this.wb = new SXSSFWorkbook();
 	}
 
 	/**
