@@ -211,10 +211,10 @@ public final class DateHelper {
 		if (week == 0) {
 			return dates;
 		}
-		int           plusDay    = week * 7;
-		ZoneOffset    zoneOffset = OffsetTime.now().getOffset();
-		LocalDateTime start      = dates[0].toInstant().atOffset(zoneOffset).toLocalDateTime();
-		LocalDate     localDate  = start.toLocalDate();
+		int plusDay = week * 7;
+		ZoneOffset zoneOffset = OffsetTime.now().getOffset();
+		LocalDateTime start = dates[0].toInstant().atOffset(zoneOffset).toLocalDateTime();
+		LocalDate localDate = start.toLocalDate();
 		return new Date[]{
 				Date.from(start.plusDays(plusDay).toInstant(zoneOffset)),
 				Date.from(localDate.atTime(23, 59, 59).plusDays(plusDay).plusDays(7 - 1).toInstant(zoneOffset))
@@ -242,9 +242,9 @@ public final class DateHelper {
 		LocalDateTime localDateTime = date.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
 		TemporalField temporalField = WeekFields.of(Locale.CHINA).dayOfWeek();
 		// 加一天，从周一到周日
-		LocalDate     localDate = localDateTime.toLocalDate();
-		LocalDateTime start     = localDate.atStartOfDay().with(temporalField, 1).plusDays(1);
-		LocalDateTime end       = localDate.atTime(23, 59, 59).with(temporalField, 7).plusDays(1);
+		LocalDate localDate = localDateTime.toLocalDate();
+		LocalDateTime start = localDate.atStartOfDay().with(temporalField, 1).plusDays(1);
+		LocalDateTime end = localDate.atTime(23, 59, 59).with(temporalField, 7).plusDays(1);
 		return new Date[]{
 				Date.from(start.toInstant(ZonedDateTime.now().getOffset())),
 				Date.from(end.toInstant(ZonedDateTime.now().getOffset()))
@@ -310,8 +310,8 @@ public final class DateHelper {
 	public static Map<String, DateTuple> splitEachQuarterWithDate(LocalDate start, LocalDate stop, String splitter) {
 		Map<String, DateTuple> result = new HashMap<>();
 		while (start.compareTo(stop) <= 0) {
-			int    month = start.getMonth().getValue();
-			String key   = (start.getYear() + splitter + ((month + 2) / 3));
+			int month = start.getMonth().getValue();
+			String key = (start.getYear() + splitter + ((month + 2) / 3));
 			result.put(key, getDateTuple(start.getYear(), (month + 2) / 3));
 			start = start.plusMonths(3);
 		}
@@ -352,8 +352,8 @@ public final class DateHelper {
 		stop = DateHelper.endOfDay(stop);
 
 		List<DateTuple> dateTuples = new ArrayList<>();
-		LocalDateTime   begin      = of(start);
-		LocalDateTime   end        = of(stop);
+		LocalDateTime begin = of(start);
+		LocalDateTime end = of(stop);
 
 		if (begin.plusDays(days).compareTo(end) >= 0) {
 			dateTuples.add(new DateTuple(begin, end));
@@ -361,7 +361,7 @@ public final class DateHelper {
 		}
 
 		LocalDateTime tmpBegin = null;
-		LocalDateTime tmpEnd   = null;
+		LocalDateTime tmpEnd = null;
 		while (begin.compareTo(end) < 0) {
 			tmpBegin = begin;
 			tmpEnd = begin.plusDays(days - 1).toLocalDate().atTime(23, 59, 59);
@@ -465,9 +465,25 @@ public final class DateHelper {
 				return ofStartOfDay(fromDateStr(dateString, dateFormatEnum));
 			case DateFormatEnum.DateFormatType.DATE_TIME:
 				return of(fromDatetimeStr(dateString, dateFormatEnum));
+			case DateFormatEnum.DateFormatType.DATE_TIME_HOUR_MINUTE:
+				return of(fromDatetimeStr(dateString, dateFormatEnum));
+			// 以下格式暂不支持
+			case DateFormatEnum.DateFormatType.DATE_MONTH_DAY:
+
+			case DateFormatEnum.DateFormatType.DATE_YEAR_MONTH:
+
+			case DateFormatEnum.DateFormatType.TIME:
+
+			case DateFormatEnum.DateFormatType.TIME_HOUR_MINUTE:
+
 			default:
 				throw new UnsupportedOperationException(String.format("Date [%s] and format [%s] is not supported yet.", dateString, dateFormatEnum.getValue()));
 		}
+	}
+
+	public static void main(String[] args) {
+		Date from = DateHelper.from("2021-07-09 18:22", DateFormatEnum.YYYY_MM_DD_HH_MM);
+		System.out.println(from);
 	}
 
 	public static Date from(String dateString, String format) {
@@ -543,12 +559,12 @@ public final class DateHelper {
 		if (stop.compareTo(start) == 0) {
 			return 1;
 		}
-		LocalDate startDate  = of(start).toLocalDate();
-		LocalDate stopDate   = of(stop).toLocalDate();
-		int       stopYear   = stopDate.getYear();
-		int       startYear  = startDate.getYear();
-		int       startMonth = startDate.getMonth().getValue();
-		int       stopMonth  = stopDate.getMonth().getValue();
+		LocalDate startDate = of(start).toLocalDate();
+		LocalDate stopDate = of(stop).toLocalDate();
+		int stopYear = stopDate.getYear();
+		int startYear = startDate.getYear();
+		int startMonth = startDate.getMonth().getValue();
+		int stopMonth = stopDate.getMonth().getValue();
 
 		switch (dateUnit) {
 			case DAY:
