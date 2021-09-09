@@ -13,6 +13,8 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.lang.reflect.Type;
 import java.util.List;
+import java.util.Locale;
+import java.util.TimeZone;
 
 /**
  * Created by sun on 2018/5/30.
@@ -57,9 +59,13 @@ public class JacksonUtil {
         defaultMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
         // map值为null不序列化
         defaultMapper.disable(SerializationFeature.WRITE_NULL_MAP_VALUES);
+        defaultMapper.setTimeZone(TimeZone.getDefault());
+        defaultMapper.setLocale(Locale.getDefault());
 
         customMapper.setSerializationInclusion(JsonInclude.Include.USE_DEFAULTS);
         customMapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
+        customMapper.setTimeZone(TimeZone.getDefault());
+        customMapper.setLocale(Locale.getDefault());
     }
 
     private JacksonUtil() {
