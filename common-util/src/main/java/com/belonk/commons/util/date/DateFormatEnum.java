@@ -59,12 +59,12 @@ public enum DateFormatEnum {
     /**
      * 日期格式化为(年-月-日 时:分:秒):yyyy-MM-dd HH:mm:ss
      */
-    YYYY_MM_DD_HH_MM_SS_S("yyyy-MM-dd HH:mm:ss.S", DateFormatType.DATE_TIME),
+    YYYY_MM_DD_HH_MM_SS_S("yyyy-MM-dd HH:mm:ss.SSS", DateFormatType.DATE_TIME),
 
     /**
      * 日期格式化为(年月日时分秒):yyyyMMddHHmmssS
      */
-    YYYYMMDDHHMMSSS("yyyyMMddHHmmssS", DateFormatType.DATE_TIME),
+    YYYYMMDDHHMMSSS("yyyyMMddHHmmssSSS", DateFormatType.DATE_TIME),
 
     /**
      * 日期格式化为(年/月/日 时:分:秒):yyyy/MM/dd HH:mm:ss
@@ -73,7 +73,7 @@ public enum DateFormatEnum {
 
     YYYY_MM_DD_HH_MM_SLASH("yyyy/MM/dd HH:mm", DateFormatType.DATE_TIME_HOUR_MINUTE),
 
-    YYYY_MM_DD_HH_MM_SS_S_SLASH("yyyy/MM/dd HH:mm:ss.S", DateFormatType.DATE_TIME),
+    YYYY_MM_DD_HH_MM_SS_S_SLASH("yyyy/MM/dd HH:mm:ss.SSS", DateFormatType.DATE_TIME),
 
     MM_DD_SLASH("MM/dd", DateFormatType.DATE_MONTH_DAY),
 
@@ -89,7 +89,7 @@ public enum DateFormatEnum {
 
     YYYY_MM_DD_HH_MM_ZN("yyyy年MM月dd日 HH:mm", DateFormatType.DATE_TIME_HOUR_MINUTE),
 
-    YYYY_MM_DD_HH_MM_SS_S_ZN("yyyy年MM月dd日 HH:mm:ss.S", DateFormatType.DATE_TIME),
+    YYYY_MM_DD_HH_MM_SS_S_ZN("yyyy年MM月dd日 HH:mm:ss.SSS", DateFormatType.DATE_TIME),
 
     MM_DD_ZN("MM月dd日", DateFormatType.DATE_MONTH_DAY),
 
