@@ -4,10 +4,7 @@ import com.belonk.commons.util.asserts.Assert;
 
 import java.time.*;
 import java.time.format.DateTimeFormatter;
-import java.time.temporal.ChronoField;
-import java.time.temporal.TemporalAccessor;
-import java.time.temporal.TemporalField;
-import java.time.temporal.WeekFields;
+import java.time.temporal.*;
 import java.util.*;
 
 /**
@@ -610,6 +607,36 @@ public final class DateHelper {
 			default:
 		}
 		return 0;
+	}
+
+	// 2022-1-7 09:57:24 add
+
+	public static Date plus(Date src, long amount, ChronoUnit unit) {
+		if (amount == 0) return src;
+		LocalDateTime localDateTime = of(src);
+		return of(localDateTime.plus(amount, unit));
+	}
+
+	public static Date minus(Date src, long amount, ChronoUnit unit) {
+		if (amount == 0) return src;
+		LocalDateTime localDateTime = of(src);
+		return of(localDateTime.minus(amount, unit));
+	}
+
+	public static Date prevDays(Date date, int days) {
+		return minus(date, days, ChronoUnit.DAYS);
+	}
+
+	public static Date nextDays(Date date, int days) {
+		return plus(date, days, ChronoUnit.DAYS);
+	}
+
+	public static Date prevDay(Date date) {
+		return prevDays(date, 1);
+	}
+
+	public static Date nextDay(Date date) {
+		return nextDays(date, 1);
 	}
 
 	/*
