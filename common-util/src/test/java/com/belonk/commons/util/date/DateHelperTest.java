@@ -272,6 +272,16 @@ public class DateHelperTest {
         System.out.println(dateTuples.size());
 	}
 
+	@Test
+	public void testIsAfter() {
+		LocalDate d1 = LocalDate.of(2019, 12, 30);
+		LocalDate d2 = LocalDate.of(2020, 1, 1);
+		LocalDate d3 = LocalDate.of(2020, 1, 1);
+		Assert.assertTrue(DateHelper.equalOrAfter(d2, d1));
+		Assert.assertFalse(DateHelper.equalOrAfter(d1, d2));
+		Assert.assertTrue(DateHelper.equal(d2, d3));
+	}
+
 	/*
 	 * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	 *

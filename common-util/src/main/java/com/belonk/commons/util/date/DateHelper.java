@@ -639,6 +639,18 @@ public final class DateHelper {
 		return nextDays(date, 1);
 	}
 
+	public static boolean isAfter(LocalDate srcDate, LocalDate destDate) {
+		return srcDate.isAfter(destDate);
+	}
+
+	public static boolean equalOrAfter(LocalDate srcDate, LocalDate destDate) {
+		return srcDate.compareTo(destDate) >= 0;
+	}
+
+	public static boolean equal(LocalDate srcDate, LocalDate destDate) {
+		return srcDate.compareTo(destDate) == 0;
+	}
+
 	/*
 	 * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	 *
