@@ -66,7 +66,7 @@ public class HttpSetting {
 	/**
 	 * @since 2.0
 	 */
-	private String requestMethod;
+	private String requestMethod = "GET";
 	/**
 	 * @since 2.0
 	 */
